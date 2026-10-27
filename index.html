@@ -2,902 +2,583 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090b10">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
 <title>GENERAL Z-SOCCER PRO V1.0</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23080808'/%3E%3Ctext x='50' y='70' text-anchor='middle' font-size='65' font-weight='bold' fill='%23e9bd52'%3EZ%3C/text%3E%3C/svg%3E">
+
 <style>
 :root {
-  --bg:#090b10;
-  --panel:#121722;
-  --panel2:#191f2c;
-  --gold:#f2c14e;
-  --green:#27d98b;
-  --red:#ff6174;
-  --blue:#56aaff;
-  --text:#f5f6fa;
-  --muted:#9aa5b5;
-  --border:#293143;
+  --bg:#080808;
+  --panel:#141414;
+  --panel2:#1c1c1c;
+  --gold:#e9bd52;
+  --gold2:#ffdc82;
+  --green:#25df8a;
+  --red:#ff6262;
+  --muted:#a4a4a4;
+  --line:#303030;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:#f7f7f7;
   font-family:Arial,Helvetica,sans-serif;
+  padding-bottom:85px;
 }
-header{
-  background:#101520;padding:16px;
-  border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:10;
-}
-.brand{font-size:20px;font-weight:900;color:var(--gold)}
-.subtitle{font-size:11px;color:var(--muted);margin-top:5px}
-.status{font-size:11px;margin-top:9px;color:var(--green)}
-nav{
-  display:flex;gap:7px;padding:10px;overflow-x:auto;
-  background:#0c1018;border-bottom:1px solid var(--border);
-}
-nav button{
-  background:var(--panel2);color:var(--text);
-  border:1px solid var(--border);border-radius:8px;
-  padding:10px 13px;white-space:nowrap;font-weight:bold;
-}
-nav button.active{background:var(--gold);color:#111;border-color:var(--gold)}
-main{padding:13px;max-width:1000px;margin:auto}
-h2{font-size:19px;margin:10px 0 14px}
-h3{font-size:15px;margin:0 0 12px}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.grid{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+header {
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#0b0b0b;
+  border-bottom:1px solid #302713;
+  padding:13px;
+  display:flex;
+  align-items:center;
   gap:10px;
 }
-.card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:14px;margin-bottom:12px;
+.logo {
+  width:43px;
+  height:43px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--gold2),#9b6b13);
+  color:#080808;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  font-weight:900;
 }
-.metric{font-size:24px;font-weight:900;color:var(--gold);margin:8px 0}
-button,.btn{
-  cursor:pointer;font-weight:bold;border-radius:8px;
+.brand { font-size:15px;font-weight:900; }
+.brand span { color:var(--gold); }
+.tagline {
+  color:var(--muted);
+  font-size:9px;
+  margin-top:4px;
+  letter-spacing:.7px;
 }
-.primary{
-  background:var(--gold);color:#111;border:0;padding:11px 14px;
+.status {
+  margin-left:auto;
+  border:1px solid #4c3b16;
+  border-radius:20px;
+  padding:6px;
+  font-size:9px;
+  color:var(--gold2);
 }
-.secondary{
-  background:var(--panel2);color:var(--text);
-  border:1px solid var(--border);padding:10px 12px;
+main { max-width:760px;margin:auto;padding:14px; }
+.page { display:none; }
+.page.active { display:block; }
+h1 { font-size:24px;margin:8px 0; }
+h2 { font-size:18px;margin:0 0 12px; }
+h3 { font-size:14px;color:var(--gold2); }
+p { color:#c6c6c6;font-size:13px;line-height:1.5; }
+.eyebrow {
+  color:var(--gold);
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:1.5px;
 }
-input,select{
-  width:100%;padding:12px;border-radius:8px;
-  background:#0b0f17;color:white;border:1px solid var(--border);
-  margin:6px 0 12px;
+.card {
+  background:var(--panel);
+  border:1px solid #292929;
+  border-radius:14px;
+  padding:15px;
+  margin:12px 0;
 }
-label{font-size:12px;color:var(--muted)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.row>*{flex:1}
-.match{
-  background:var(--panel);border:1px solid var(--border);
-  padding:14px;border-radius:12px;margin:10px 0;
+.hero {
+  background:linear-gradient(135deg,#211a0a,#111);
+  border-color:#57451d;
 }
-.match-title{font-weight:bold;margin:8px 0}
-.tag{
-  display:inline-block;background:#252d3d;padding:5px 8px;
-  border-radius:6px;font-size:11px;margin:3px 3px 3px 0;
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
 }
-.tag.gold{background:#493b19;color:#ffda77}
-.tag.green{background:#103c2c;color:#70f0b3}
-.tag.red{background:#461d27;color:#ff9ba8}
-.bar{height:7px;background:#293143;border-radius:8px;overflow:hidden}
-.bar span{display:block;height:100%;background:var(--gold)}
-.market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.market{padding:10px;background:#0c111b;border-radius:8px;border:1px solid var(--border)}
-.market b{display:block;color:var(--gold);font-size:13px;margin-top:5px}
-.hidden{display:none!important}
-.notice{
-  border-left:3px solid var(--gold);background:#191a1c;
-  padding:12px;font-size:12px;color:#d4d7df;line-height:1.6;
+.metric {
+  background:var(--panel2);
+  padding:13px;
+  border-radius:11px;
+  border:1px solid #2c2c2c;
 }
-footer{text-align:center;padding:25px 12px;color:var(--muted);font-size:11px}
-@media(min-width:650px){
-  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-  .market-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric strong {
+  display:block;
+  color:var(--gold2);
+  font-size:22px;
+  margin-top:7px;
+}
+.metric small { color:var(--muted);font-size:10px; }
+button {
+  border:0;
+  border-radius:9px;
+  padding:11px 13px;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  color:#111;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+}
+button.secondary {
+  background:#242424;
+  color:#eee;
+  border:1px solid #393939;
+}
+button.danger {
+  background:#321a1a;
+  color:#ffb3b3;
+  border:1px solid #623030;
+}
+.row { display:flex;gap:8px;flex-wrap:wrap; }
+.row>* { flex:1;min-width:0; }
+.pill {
+  display:inline-block;
+  border:1px solid #5a471c;
+  border-radius:20px;
+  padding:5px 8px;
+  color:var(--gold2);
+  font-size:10px;
+}
+label {
+  display:block;
+  color:#c9c9c9;
+  font-size:11px;
+  margin:10px 0 5px;
+}
+input,select,textarea {
+  width:100%;
+  padding:11px;
+  border-radius:8px;
+  background:#0b0b0b;
+  color:white;
+  border:1px solid #393939;
+  font:inherit;
+  font-size:13px;
+}
+textarea { min-height:70px; }
+.market-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.market {
+  background:#101010;
+  border:1px solid #303030;
+  border-radius:10px;
+  padding:12px;
+}
+.market b { display:block;font-size:12px; }
+.market span {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:6px;
+}
+.notice {
+  border-left:3px solid var(--gold);
+  padding:10px 12px;
+  background:#1a160c;
+  color:#e7d7ad;
+  border-radius:5px;
+  font-size:12px;
+  line-height:1.5;
+}
+.small { font-size:11px;color:var(--muted); }
+.empty {
+  text-align:center;
+  padding:22px 10px;
+  color:var(--muted);
+  font-size:13px;
+}
+.result {
+  border:1px solid #333;
+  background:#101010;
+  padding:12px;
+  border-radius:10px;
+  margin:8px 0;
+}
+nav {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:20;
+  background:#0d0d0d;
+  border-top:1px solid #393020;
+  padding:8px 5px;
+}
+.nav-inner {
+  max-width:760px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+}
+.nav-item {
+  background:transparent;
+  color:#aaa;
+  border:1px solid transparent;
+  padding:9px 3px;
+  font-size:11px;
+}
+.nav-item.active {
+  color:var(--gold2);
+  background:#241d0d;
+  border-color:#57451d;
+}
+footer {
+  text-align:center;
+  color:#777;
+  font-size:10px;
+  padding:18px 5px;
+}
+@media(min-width:600px) {
+  main { padding:22px; }
+  .market-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
 }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">⚽ GENERAL Z-SOCCER PRO V1.0</div>
-  <div class="subtitle">FOOTBALL STATISTICS • MATCH ANALYSIS • PREDICTIONS</div>
-  <div class="status" id="connectionStatus">● DATA CONNECTION NOT CONFIGURED</div>
+  <div class="logo">Z</div>
+  <div>
+    <div class="brand">GENERAL <span>Z-SOCCER PRO</span></div>
+    <div class="tagline">ZOOM SOCCER ANALYSIS • V1.0</div>
+  </div>
+  <div class="status" id="status">DATA NOT CONNECTED</div>
 </header>
 
-<nav id="navigation">
-  <button class="active" data-page="home">Home</button>
-  <button data-page="matches">Matches</button>
-  <button data-page="analysis">AI Analysis</button>
-  <button data-page="markets">Markets</button>
-  <button data-page="history">History</button>
-  <button data-page="settings">Settings</button>
-  <button data-page="vip">VIP / Premium</button>
-</nav>
-
 <main>
-<section id="page-home">
-  <h2>Dashboard Overview</h2>
+
+<section class="page active" id="home">
+  <div class="card hero">
+    <div class="eyebrow">WELCOME TO YOUR ZONE</div>
+    <h1>Zoom Soccer Centre</h1>
+    <p>One simple place for Zoom Soccer markets, saved results and analysis.</p>
+    <div class="row">
+      <button onclick="showPage('predictions')">OPEN PREDICTIONS</button>
+      <button class="secondary" onclick="showPage('history')">ADD PAST RESULT</button>
+    </div>
+  </div>
+
   <div class="grid">
-    <div class="card">
-      <div class="muted small">Available Fixtures</div>
-      <div class="metric" id="fixtureCount">0</div>
-      <div class="small muted">Loaded matches</div>
+    <div class="metric">
+      <small>RECORDED RESULTS</small>
+      <strong id="resultCount">0</strong>
     </div>
-    <div class="card">
-      <div class="muted small">Saved Predictions</div>
-      <div class="metric" id="pickCount">0</div>
-      <div class="small muted">In your history</div>
-    </div>
-    <div class="card">
-      <div class="muted small">Data Provider</div>
-      <div class="metric" style="font-size:17px">Football API</div>
-      <div class="small muted">Requires configuration</div>
-    </div>
-    <div class="card">
-      <div class="muted small">Prediction Mode</div>
-      <div class="metric" style="font-size:17px">Statistical</div>
-      <div class="small muted">Not guaranteed</div>
+    <div class="metric">
+      <small>SAVED ANALYSES</small>
+      <strong id="analysisCount">0</strong>
     </div>
   </div>
 
   <div class="card">
-    <h3>Load Fixtures</h3>
-    <p class="muted small">Choose a date and load fixtures from the configured football data provider.</p>
-    <label for="matchDate">Match date</label>
-    <input type="date" id="matchDate">
-    <label for="competition">Competition</label>
-    <select id="competition">
-      <option value="">All available competitions</option>
-      <option value="PL">Premier League</option>
-      <option value="PD">La Liga</option>
-      <option value="BL1">Bundesliga</option>
-      <option value="SA">Serie A</option>
-      <option value="FL1">Ligue 1</option>
-      <option value="CL">Champions League</option>
-      <option value="BSA">Brazil Serie A</option>
-      <option value="DED">Eredivisie</option>
-      <option value="PPL">Primeira Liga</option>
-    </select>
-    <button class="primary" id="loadFixtures">Load Real Fixtures</button>
-    <button class="secondary" id="demoButton">View Demo Example</button>
+    <h2>Platform status</h2>
+    <div class="notice">
+      This app is focused on virtual Zoom Soccer. A verified live Zoom Soccer data feed is not connected yet, so the app will not invent live matches, scores or predictions.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Getting started</h2>
+    <p>1. Record actual results you have checked in History.</p>
+    <p>2. Open Predictions to see all markets together.</p>
+    <p>3. A genuine data source must be connected before the app can show live Zoom Soccer predictions.</p>
+  </div>
+</section>
+<section class="page" id="predictions">
+  <div class="eyebrow">ALL MARKETS IN ONE PLACE</div>
+  <h1>Predictions</h1>
+  <p>All available market categories are displayed below. Live estimates require a verified Zoom Soccer data connection.</p>
+
+  <div class="card">
+    <div class="notice">
+      LIVE ZOOM DATA NOT CONNECTED. These are market categories, not active betting tips. No live predictions are being invented.
+    </div>
+  </div>
+
+  <div class="market-grid">
+    <div class="market"><b>1X2 — Home / Draw / Away</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Correct Score</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Over / Under Goals</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Both Teams To Score</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Half-Time / Full-Time</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Odd / Even Goals</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Home Team Goals</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Away Team Goals</b><span>Awaiting verified data</span></div>
+    <div class="market"><b>Double Chance</b><span>Awaiting verified data</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Analysis workspace</h2>
+    <p id="analysisMessage">No Zoom Soccer results have been recorded yet.</p>
+    <button onclick="showPage('history')">GO TO HISTORY</button>
+  </div>
+</section>
+
+<section class="page" id="vip">
+  <div class="eyebrow">MEMBERS AREA</div>
+  <h1>VIP & Premium</h1>
+
+  <div class="card hero">
+    <h2>Membership options</h2>
+    <p>Planned membership access options:</p>
+    <div class="grid">
+      <div class="metric"><small>ACCESS PLAN</small><strong>Daily</strong></div>
+      <div class="metric"><small>ACCESS PLAN</small><strong>Weekly</strong></div>
+      <div class="metric"><small>ACCESS PLAN</small><strong>Monthly</strong></div>
+      <div class="metric"><small>MEMBERSHIP</small><strong>Premium</strong></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Member access</h2>
+    <label for="accessCode">Private access code</label>
+    <input id="accessCode" type="password" placeholder="Enter access code">
+    <button class="secondary" style="margin-top:10px;width:100%" onclick="membershipNotice()">CHECK ACCESS</button>
+    <p id="vipMessage" class="small">Secure access-code validation and payment processing are not activated yet.</p>
   </div>
 
   <div class="notice">
-    Predictions are estimates based on available statistics. Demo examples are illustrative, not live fixtures or real forecasts. Never treat a prediction as a guaranteed win.
-  </div>
-
-  <h2>Fixtures & Picks</h2>
-  <div id="homeMatches">
-    <div class="card muted small">No fixtures loaded yet. Configure your data connection in Settings.</div>
+    Membership is not active yet. Do not send payment based only on this demo screen.
   </div>
 </section>
 
-<section id="page-matches" class="hidden">
-  <h2>Match Centre</h2>
-  <div class="card">
-    <label for="matchSearch">Search loaded teams</label>
-    <input id="matchSearch" placeholder="Enter a team name...">
-    <label for="matchFilter">Fixture filter</label>
-    <select id="matchFilter">
-      <option value="all">All fixtures</option>
-      <option value="scheduled">Scheduled</option>
-      <option value="finished">Finished</option>
-      <option value="live">Live / In progress</option>
-    </select>
-  </div>
-  <div id="matchList"></div>
-</section>
+<section class="page" id="history">
+  <div class="eyebrow">YOUR RECORD BOOK</div>
+  <h1>History</h1>
+  <p>Save actual Zoom Soccer scores you have checked. These records stay in this browser on this device.</p>
 
-<section id="page-analysis" class="hidden">
-  <h2>Statistical Match Analysis</h2>
   <div class="card">
-    <p class="muted small">Choose a loaded match to view estimated probabilities and available statistical indicators.</p>
-    <label for="analysisMatch">Select match</label>
-    <select id="analysisMatch">
-      <option value="">Load fixtures first</option>
-    </select>
-    <button class="primary" id="analyseButton">Analyse Match</button>
-  </div>
-  <div id="analysisOutput"></div>
-</section>
+    <h2>Add a Zoom Soccer result</h2>
 
-<section id="page-markets" class="hidden">
-  <h2>Prediction Markets</h2>
-  <div class="card">
-    <p class="muted small">Available markets will be calculated for selected fixtures when adequate data is available.</p>
-    <div class="market-grid">
-      <div class="market">Match result<b>1X2</b></div>
-      <div class="market">Half / Full Time<b>HT/FT</b></div>
-      <div class="market">Correct score<b>Scorelines</b></div>
-      <div class="market">Total goals<b>Over / Under</b></div>
-      <div class="market">Both teams score<b>BTTS</b></div>
-      <div class="market">Double chance<b>1X / X2 / 12</b></div>
-      <div class="market">Half-time goals<b>1st Half</b></div>
-      <div class="market">Corner totals<b>Over / Under Corners</b></div>
-      <div class="market">Team goals<b>Home / Away</b></div>
-      <div class="market">Clean sheet<b>Yes / No</b></div>
-      <div class="market">Draw no bet<b>Home / Away</b></div>
-      <div class="market">Goal ranges<b>0–1 / 2–3 / 4+</b></div>
-    </div>
-  </div>
-  <div id="marketOutput"></div>
-</section>
+    <label for="roundName">Match / round reference</label>
+    <input id="roundName" placeholder="e.g. Round 08">
 
-<section id="page-history" class="hidden">
-  <h2>Prediction History</h2>
-  <div class="card">
-    <p class="muted small">Saved selections are stored in this browser. Verification requires actual match results.</p>
     <div class="row">
-      <button class="secondary" id="exportHistory">Export CSV</button>
-      <button class="secondary" id="clearHistory">Clear History</button>
+      <div>
+        <label for="homeScore">Home score</label>
+        <input id="homeScore" type="number" min="0" max="99" inputmode="numeric" placeholder="0">
+      </div>
+      <div>
+        <label for="awayScore">Away score</label>
+        <input id="awayScore" type="number" min="0" max="99" inputmode="numeric" placeholder="0">
+      </div>
     </div>
-  </div>
-  <div id="historyList"></div>
-</section>
 
-<section id="page-settings" class="hidden">
-  <h2>Settings & Data Connection</h2>
-  <div class="card">
-    <h3>Football-data.org API</h3>
-    <p class="muted small">Enter your token to load supported fixtures. The token entered here is stored only in this browser's local storage; it is not a secure production secret store.</p>
-    <label for="apiToken">API token</label>
-    <input id="apiToken" type="password" autocomplete="off" placeholder="Paste your API token">
-    <div class="row">
-      <button class="primary" id="saveToken">Save Token</button>
-      <button class="secondary" id="testConnection">Test Connection</button>
-    </div>
-    <p id="apiMessage" class="small muted"></p>
-  </div>
-  <div class="notice">Do not publish API tokens in public source code. For a public production app, proxy API requests through a backend that protects the token. Provider coverage and rate limits apply.</div>
-</section>
+    <label for="resultNotes">Notes (optional)</label>
+    <textarea id="resultNotes" placeholder="Where or when you checked this result"></textarea>
 
-<section id="page-vip" class="hidden">
-  <h2>VIP & Premium</h2>
-  <div class="card">
-    <span class="tag gold">VIP PREVIEW</span>
-    <h3>VIP Match Insights</h3>
-    <p class="muted small">A section for curated match analysis and statistical picks.</p>
-    <div id="vipContent">VIP access and membership verification are not configured.</div>
+    <button style="width:100%;margin-top:10px" onclick="addResult()">SAVE RESULT</button>
+    <p class="small">Save only results you have checked. The app does not independently verify these scores.</p>
   </div>
-  <div class="card">
-    <span class="tag gold">PREMIUM PREVIEW</span>
-    <h3>Premium Analysis</h3>
-    <p class="muted small">A section for advanced market comparisons and detailed match reports.</p>
-    <div id="premiumContent">Payment processing and secure membership access are not implemented.</div>
+
+  <div class="row">
+    <button class="secondary" onclick="exportHistory()">EXPORT CSV</button>
+    <button class="danger" onclick="clearHistory()">CLEAR HISTORY</button>
+  </div>
+
+  <div id="historyList" class="card">
+    <div class="empty">No results recorded yet.</div>
   </div>
 </section>
-</main>
 
 <footer>
-  GENERAL Z-SOCCER PRO V1.0 • Statistical estimates only • No guaranteed results
+  GENERAL Z-SOCCER PRO V1.0<br>
+  Analysis only • No guaranteed outcomes
 </footer>
+
+</main>
+
+<nav>
+  <div class="nav-inner">
+    <button class="nav-item active" data-page="home" onclick="showPage('home',this)">⌂<br>HOME</button>
+    <button class="nav-item" data-page="predictions" onclick="showPage('predictions',this)">◎<br>PREDICTIONS</button>
+    <button class="nav-item" data-page="vip" onclick="showPage('vip',this)">♛<br>VIP</button>
+    <button class="nav-item" data-page="history" onclick="showPage('history',this)">▤<br>HISTORY</button>
+  </div>
+</nav>
 <script>
-"use strict";
+const STORE_KEY = 'generalZZoomResultsV1';
+let results = [];
 
-const ZSOCCER = {
-  fixtures: [],
-  history: JSON.parse(localStorage.getItem("gzsp_history") || "[]"),
-  token: localStorage.getItem("gzsp_token") || "",
-  selectedMatch: null
-};
-
-const $ = id => document.getElementById(id);
-
-function saveHistory() {
-  localStorage.setItem("gzsp_history", JSON.stringify(ZSOCCER.history));
-  updateCounters();
-  renderHistory();
+try {
+  results = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+  if (!Array.isArray(results)) results = [];
+} catch (error) {
+  results = [];
 }
 
-function updateCounters() {
-  $("fixtureCount").textContent = ZSOCCER.fixtures.length;
-  $("pickCount").textContent = ZSOCCER.history.length;
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.toggle('active', page.id === id);
+  });
+
+  document.querySelectorAll('.nav-item').forEach(button => {
+    button.classList.toggle('active', button.dataset.page === id);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (id === 'history') renderHistory();
 }
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
-  })[c]);
-}
-
-function poissonProbability(lambda, goals) {
-  if (!Number.isFinite(lambda) || lambda < 0) return 0;
-  let factorial = 1;
-  for (let i = 2; i <= goals; i++) factorial *= i;
-  return Math.exp(-lambda) * Math.pow(lambda, goals) / factorial;
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-/*
-  Estimate goals from recent results.
-  These are statistical estimates, not verified betting signals.
-*/
-function estimateGoals(recentMatches, teamId, isHome) {
-  const scored = [];
-  const conceded = [];
-
-  for (const match of recentMatches || []) {
-    const home = match.homeTeam?.id === teamId;
-    const away = match.awayTeam?.id === teamId;
-    if (!home && !away) continue;
-
-    const score = match.score?.fullTime;
-    if (score?.home == null || score?.away == null) continue;
-
-    scored.push(home ? score.home : score.away);
-    conceded.push(home ? score.away : score.home);
-  }
-
-  if (!scored.length) return { attack: 1.25, defence: 1.25, sample: 0 };
-
-  const average = list => list.reduce((a,b) => a+b, 0) / list.length;
-  return {
-    attack: clamp(average(scored), 0.2, 3.5),
-    defence: clamp(average(conceded), 0.2, 3.5),
-    sample: scored.length
-  };
-}
-
-function calculateMarkets(homeLambda, awayLambda) {
-  homeLambda = clamp(homeLambda, 0.15, 4.5);
-  awayLambda = clamp(awayLambda, 0.15, 4.5);
-
-  let home = 0, draw = 0, away = 0;
-  let over15 = 0, over25 = 0, over35 = 0;
-  let bttsYes = 0;
-  const scores = [];
-  const scoreMatrix = [];
-
-  for (let h = 0; h <= 8; h++) {
-    const ph = poissonProbability(homeLambda, h);
-    const row = [];
-
-    for (let a = 0; a <= 8; a++) {
-      const p = ph * poissonProbability(awayLambda, a);
-      row.push(p);
-
-      if (h > a) home += p;
-      else if (h === a) draw += p;
-      else away += p;
-
-      if (h + a >= 2) over15 += p;
-      if (h + a >= 3) over25 += p;
-      if (h + a >= 4) over35 += p;
-      if (h > 0 && a > 0) bttsYes += p;
-
-      scores.push({ home:h, away:a, probability:p });
-    }
-
-    scoreMatrix.push(row);
-  }
-
-  scores.sort((a,b) => b.probability - a.probability);
-
-  const homeHT = homeLambda * 0.44;
-  const awayHT = awayLambda * 0.44;
-  const ht = calculateHalfTime(homeHT, awayHT);
-
-  const expectedCorners = clamp(9.4 + (homeLambda + awayLambda - 2.5) * 0.7, 5, 14);
-
-  return {
-    home, draw, away,
-    over15, over25, over35,
-    under25: 1 - over25,
-    under35: 1 - over35,
-    bttsYes,
-    bttsNo: 1 - bttsYes,
-    scores: scores.slice(0,5),
-    ht,
-    expectedCorners,
-    homeLambda,
-    awayLambda
-  };
-}
-
-function calculateHalfTime(homeLambda, awayLambda) {
-  let home = 0, draw = 0, away = 0;
-  for (let h = 0; h <= 6; h++) {
-    for (let a = 0; a <= 6; a++) {
-      const p = poissonProbability(homeLambda,h) *
-                poissonProbability(awayLambda,a);
-      if (h > a) home += p;
-      else if (h === a) draw += p;
-      else away += p;
-    }
-  }
-  return {home, draw, away};
-}
-
-function percent(value) {
-  return `${Math.round(clamp(value,0,1) * 100)}%`;
-}
-
-function strongestOutcome(m) {
-  const outcomes = [
-    ["Home Win",m.home],
-    ["Draw",m.draw],
-    ["Away Win",m.away]
-  ];
-  outcomes.sort((a,b) => b[1]-a[1]);
-  return outcomes[0];
-}
-
-function doubleChance(m) {
-  return [
-    ["1X",m.home+m.draw],
-    ["X2",m.draw+m.away],
-    ["12",m.home+m.away]
-  ].sort((a,b)=>b[1]-a[1]);
-}
-
-function htftEstimate(m) {
-  const outcomes = [
-    ["1/1",m.home*m.ht.home],
-    ["1/X",m.home*m.ht.draw],
-    ["1/2",m.home*m.ht.away],
-    ["X/1",m.draw*m.ht.home],
-    ["X/X",m.draw*m.ht.draw],
-    ["X/2",m.draw*m.ht.away],
-    ["2/1",m.away*m.ht.home],
-    ["2/X",m.away*m.ht.draw],
-    ["2/2",m.away*m.ht.away]
-  ];
-  return outcomes.sort((a,b)=>b[1]-a[1]).slice(0,3);
-}
-
-/*
-  Corner predictions are clearly labelled as rough estimates.
-  A proper corner model needs actual historical corner statistics.
-*/
-function cornerEstimate(m) {
-  const total = m.expectedCorners;
-  return {
-    total,
-    over75: total > 7.5 ? 0.61 : 0.39,
-    over85: total > 8.5 ? 0.56 : 0.44,
-    over95: total > 9.5 ? 0.51 : 0.49,
-    source: "Rough estimate only; no historical corner feed"
-  };
-}
-
-function marketCards(m) {
-  const topScore = m.scores[0];
-  const dc = doubleChance(m);
-  const htft = htftEstimate(m);
-  const corners = cornerEstimate(m);
-
-  return `
-    <div class="market-grid">
-      <div class="market">Home Win<b>${percent(m.home)}</b></div>
-      <div class="market">Draw<b>${percent(m.draw)}</b></div>
-      <div class="market">Away Win<b>${percent(m.away)}</b></div>
-      <div class="market">Over 1.5 Goals<b>${percent(m.over15)}</b></div>
-      <div class="market">Over 2.5 Goals<b>${percent(m.over25)}</b></div>
-      <div class="market">Under 2.5 Goals<b>${percent(m.under25)}</b></div>
-      <div class="market">Over 3.5 Goals<b>${percent(m.over35)}</b></div>
-      <div class="market">BTTS — Yes<b>${percent(m.bttsYes)}</b></div>
-      <div class="market">BTTS — No<b>${percent(m.bttsNo)}</b></div>
-      <div class="market">Double Chance<b>${dc[0][0]} · ${percent(dc[0][1])}</b></div>
-      <div class="market">Top Correct Score<b>${topScore.home}–${topScore.away} · ${percent(topScore.probability)}</b></div>
-      <div class="market">Expected Total Goals<b>${(m.homeLambda+m.awayLambda).toFixed(2)}</b></div>
-      <div class="market">Half-Time Home<b>${percent(m.ht.home)}</b></div>
-      <div class="market">Half-Time Draw<b>${percent(m.ht.draw)}</b></div>
-      <div class="market">Half-Time Away<b>${percent(m.ht.away)}</b></div>
-      <div class="market">HT/FT Estimate<b>${htft[0][0]} · ${percent(htft[0][1])}</b></div>
-      <div class="market">Estimated Corners<b>${corners.total.toFixed(1)}</b></div>
-      <div class="market">Over 8.5 Corners<b>${percent(corners.over85)}</b></div>
-    </div>
-    <p class="muted small">
-      HT/FT uses a simplified approximation. Corner percentages are illustrative,
-      not derived from historical corner data. Probabilities are not guarantees.
-    </p>`;
-}
-
-async function getRecentMatches(teamId) {
-  if (!ZSOCCER.token) return [];
-  const url = `https://api.football-data.org/v4/teams/${teamId}/matches?status=FINISHED&limit=10`;
-
+function persist() {
   try {
-    const response = await fetch(url, {
-      headers: {"X-Auth-Token": ZSOCCER.token}
-    });
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.matches || [];
-  } catch {
-    return [];
+    localStorage.setItem(STORE_KEY, JSON.stringify(results));
+  } catch (error) {
+    alert('Could not save results in this browser. Check your browser storage settings.');
   }
+
+  renderHistory();
+  updateCounts();
 }
 
-async function analyseFixture(fixture) {
-  const [homeRecent, awayRecent] = await Promise.all([
-    getRecentMatches(fixture.homeTeam.id),
-    getRecentMatches(fixture.awayTeam.id)
-  ]);
+function addResult() {
+  const round = document.getElementById('roundName').value.trim();
+  const homeInput = document.getElementById('homeScore').value;
+  const awayInput = document.getElementById('awayScore').value;
+  const notes = document.getElementById('resultNotes').value.trim();
 
-  const homeStats = estimateGoals(homeRecent, fixture.homeTeam.id, true);
-  const awayStats = estimateGoals(awayRecent, fixture.awayTeam.id, false);
+  if (
+    homeInput === '' ||
+    awayInput === '' ||
+    !Number.isInteger(Number(homeInput)) ||
+    !Number.isInteger(Number(awayInput)) ||
+    Number(homeInput) < 0 ||
+    Number(awayInput) < 0 ||
+    Number(homeInput) > 99 ||
+    Number(awayInput) > 99
+  ) {
+    alert('Please enter valid home and away scores between 0 and 99.');
+    return;
+  }
 
-  const homeLambda = (homeStats.attack + awayStats.defence) / 2 * 1.08;
-  const awayLambda = (awayStats.attack + homeStats.defence) / 2 * 0.92;
+  results.unshift({
+    id: Date.now(),
+    round: round || 'Zoom result',
+    home: Number(homeInput),
+    away: Number(awayInput),
+    notes: notes,
+    date: new Date().toLocaleString()
+  });
 
-  return {
-    markets: calculateMarkets(homeLambda,awayLambda),
-    homeSample: homeStats.sample,
-    awaySample: awayStats.sample
-  };
-}
+  persist();
 
-function renderAnalysis(fixture, result) {
-  const m = result.markets;
-  const top = strongestOutcome(m);
+  document.getElementById('roundName').value = '';
+  document.getElementById('homeScore').value = '';
+  document.getElementById('awayScore').value = '';
+  document.getElementById('resultNotes').value = '';
 
-  $("analysisOutput").innerHTML = `
-    <div class="card">
-      <span class="tag gold">STATISTICAL ESTIMATE</span>
-      <h3>${escapeHTML(fixture.homeTeam.name)} vs ${escapeHTML(fixture.awayTeam.name)}</h3>
-      <p class="muted small">Recent matches available: home ${result.homeSample}, away ${result.awaySample}.</p>
-      <p>Most likely 1X2 outcome: <b>${top[0]} (${percent(top[1])})</b></p>
-      ${marketCards(m)}
-      <button class="primary" id="saveCurrentPick">Save Prediction</button>
-    </div>`;
+  document.getElementById('analysisMessage').textContent =
+    'You have saved ' + results.length +
+    ' result(s). These records do not guarantee future outcomes.';
 
-  $("saveCurrentPick").onclick = () => {
-    ZSOCCER.history.unshift({
-      id: String(fixture.id),
-      match: `${fixture.homeTeam.name} vs ${fixture.awayTeam.name}`,
-      date: fixture.utcDate,
-      prediction: `${top[0]} (${percent(top[1])})`,
-      score: `${m.scores[0].home}-${m.scores[0].away}`,
-      status: "Pending",
-      savedAt: new Date().toISOString()
-    });
-    saveHistory();
-    alert("Prediction saved to your history.");
-  };
-
-  $("marketOutput").innerHTML = marketCards(m);
+  alert('Result saved on this device.');
 }
 
 function renderHistory() {
-  if (!$("historyList")) return;
-  if (!ZSOCCER.history.length) {
-    $("historyList").innerHTML = '<div class="card muted small">No saved predictions yet.</div>';
+  const list = document.getElementById('historyList');
+
+  if (!results.length) {
+    list.innerHTML = '<div class="empty">No results recorded yet.</div>';
     return;
   }
 
-  $("historyList").innerHTML = ZSOCCER.history.map((p,i)=>`
-    <div class="match">
-      <div class="match-title">${escapeHTML(p.match)}</div>
-      <span class="tag gold">${escapeHTML(p.prediction)}</span>
-      <span class="tag">Score estimate ${escapeHTML(p.score)}</span>
-      <span class="tag">${escapeHTML(p.status)}</span>
-      <div class="small muted">${escapeHTML(p.date || "")}</div>
-      <button class="secondary" data-remove="${i}">Remove</button>
-    </div>`).join("");
-
-  $("historyList").querySelectorAll("[data-remove]").forEach(btn=>{
-    btn.onclick=()=>{
-      ZSOCCER.history.splice(Number(btn.dataset.remove),1);
-      saveHistory();
-    };
-  });
-}/* PART 3 — APP CONTROLS AND FOOTBALL API */
-
-function setStatus(message, good=false) {
-  const el = $("connectionStatus");
-  if (el) {
-    el.textContent = "● " + message;
-    el.style.color = good ? "var(--green)" : "var(--gold)";
-  }
-}
-
-function showPage(page) {
-  document.querySelectorAll("main section").forEach(section => {
-    section.classList.add("hidden");
-  });
-  const target = $("page-" + page);
-  if (target) target.classList.remove("hidden");
-
-  document.querySelectorAll("#navigation button").forEach(button => {
-    button.classList.toggle("active", button.dataset.page === page);
-  });
-
-  if (page === "history") renderHistory();
-  if (page === "matches") renderMatches();
-}
-
-document.querySelectorAll("#navigation button").forEach(button => {
-  button.addEventListener("click", () => showPage(button.dataset.page));
-});
-
-function renderFixtureCard(fixture) {
-  const home = fixture.homeTeam?.name || "Home";
-  const away = fixture.awayTeam?.name || "Away";
-  const date = fixture.utcDate ? new Date(fixture.utcDate).toLocaleString() : "Date unavailable";
-  const score = fixture.score?.fullTime;
-  const finished = fixture.status === "FINISHED";
-  const scoreText = finished && score?.home != null
-    ? `${score.home} - ${score.away}`
-    : fixture.status === "IN_PLAY" || fixture.status === "LIVE"
-      ? "LIVE"
-      : "VS";
-
-  return `
-    <div class="match">
-      <div class="row">
-        <span class="tag gold">${escapeHTML(fixture.competition?.name || "Competition")}</span>
-        <span class="tag">${escapeHTML(fixture.status || "SCHEDULED")}</span>
+  list.innerHTML =
+    '<h2>Saved results</h2>' +
+    results.map(result => `
+      <div class="result">
+        <strong>${escapeHtml(result.round)}</strong>
+        <div class="small">${escapeHtml(result.date)}</div>
+        <h3>${result.home} - ${result.away}</h3>
+        <div class="small">${escapeHtml(result.notes || 'No notes added')}</div>
+        <button class="danger" style="margin-top:8px"
+          onclick="deleteResult(${result.id})">DELETE</button>
       </div>
-      <div class="match-title">${escapeHTML(home)} <span class="muted">${escapeHTML(scoreText)}</span> ${escapeHTML(away)}</div>
-      <div class="small muted">${escapeHTML(date)}</div>
-      <div class="row" style="margin-top:12px">
-        <button class="primary" data-analyse="${fixture.id}">Analyse</button>
-        <button class="secondary" data-save="${fixture.id}">Save Fixture</button>
-      </div>
-    </div>`;
+    `).join('');
 }
 
-function renderMatches() {
-  const query = ($("matchSearch")?.value || "").trim().toLowerCase();
-  const filter = $("matchFilter")?.value || "all";
+function deleteResult(id) {
+  if (!confirm('Delete this saved result?')) return;
 
-  const list = ZSOCCER.fixtures.filter(f => {
-    const names = `${f.homeTeam?.name || ""} ${f.awayTeam?.name || ""}`.toLowerCase();
-    const matchesSearch = names.includes(query);
-    const matchesFilter = filter === "all" ||
-      (filter === "finished" && f.status === "FINISHED") ||
-      (filter === "scheduled" && ["SCHEDULED","TIMED","POSTPONED"].includes(f.status)) ||
-      (filter === "live" && ["IN_PLAY","LIVE","PAUSED"].includes(f.status));
-    return matchesSearch && matchesFilter;
-  });
-
-  $("matchList").innerHTML = list.length
-    ? list.map(renderFixtureCard).join("")
-    : '<div class="card muted small">No matching fixtures. Load a date with available fixtures first.</div>';
-
-  attachFixtureButtons();
+  results = results.filter(result => result.id !== id);
+  persist();
 }
 
-function renderHomeMatches() {
-  $("homeMatches").innerHTML = ZSOCCER.fixtures.length
-    ? ZSOCCER.fixtures.slice(0,12).map(renderFixtureCard).join("")
-    : '<div class="card muted small">No fixtures loaded yet. Configure your data connection in Settings.</div>';
-  attachFixtureButtons();
-}
-
-function attachFixtureButtons() {
-  document.querySelectorAll("[data-analyse]").forEach(button => {
-    button.onclick = () => openAnalysis(button.dataset.analyse);
-  });
-
-  document.querySelectorAll("[data-save]").forEach(button => {
-    button.onclick = () => {
-      const fixture = ZSOCCER.fixtures.find(f => String(f.id) === String(button.dataset.save));
-      if (!fixture) return;
-      ZSOCCER.history.unshift({
-        id: String(fixture.id),
-        match: `${fixture.homeTeam.name} vs ${fixture.awayTeam.name}`,
-        date: fixture.utcDate,
-        prediction: "Not analysed yet",
-        score: "—",
-        status: "Pending",
-        savedAt: new Date().toISOString()
-      });
-      saveHistory();
-      alert("Fixture saved to history.");
-    };
-  });
-}
-
-async function openAnalysis(fixtureId) {
-  const fixture = ZSOCCER.fixtures.find(f => String(f.id) === String(fixtureId));
-  if (!fixture) return;
-
-  showPage("analysis");
-  $("analysisMatch").value = String(fixture.id);
-  $("analysisOutput").innerHTML = '<div class="card">Loading recent results and calculating estimates…</div>';
-
-  const result = await analyseFixture(fixture);
-  renderAnalysis(fixture, result);
-}
-
-async function loadFixtures() {
-  if (!ZSOCCER.token) {
-    setStatus("API TOKEN REQUIRED");
-    alert("Open Settings, enter your football-data.org API token, and save it first.");
-    showPage("settings");
+function clearHistory() {
+  if (!results.length) {
+    alert('History is already empty.');
     return;
   }
 
-  const date = $("matchDate").value || new Date().toISOString().slice(0,10);
-  const competition = $("competition").value;
-  const params = new URLSearchParams({
-    dateFrom: date,
-    dateTo: date
-  });
-  if (competition) params.set("competitions", competition);
+  if (!confirm('Delete all saved results from this device?')) return;
 
-  $("homeMatches").innerHTML = '<div class="card">Loading fixtures…</div>';
-  setStatus("LOADING FIXTURES");
-
-  try {
-    const response = await fetch(`https://api.football-data.org/v4/matches?${params}`, {
-      headers: {"X-Auth-Token": ZSOCCER.token}
-    });
-
-    if (!response.ok) {
-      const message = response.status === 403
-        ? "Provider denied access. Check your token and competition access."
-        : `Football API error: ${response.status}`;
-      throw new Error(message);
-    }
-
-    const data = await response.json();
-    ZSOCCER.fixtures = (data.matches || []).map(match => ({
-      ...match,
-      competition: match.competition || {}
-    }));
-
-    const selector = $("analysisMatch");
-    selector.innerHTML = ZSOCCER.fixtures.length
-      ? ZSOCCER.fixtures.map(f =>
-          `<option value="${f.id}">${escapeHTML(f.homeTeam.name)} vs ${escapeHTML(f.awayTeam.name)}</option>`
-        ).join("")
-      : '<option value="">No fixtures for this date</option>';
-
-    renderHomeMatches();
-    renderMatches();
-    updateCounters();
-    setStatus(`FIXTURES LOADED: ${ZSOCCER.fixtures.length}`, true);
-
-    if (!ZSOCCER.fixtures.length) {
-      $("homeMatches").innerHTML =
-        '<div class="card muted small">No fixtures were returned for this date and competition. Try another date or competition.</div>';
-    }
-  } catch (error) {
-    setStatus("FIXTURE LOAD FAILED");
-    $("homeMatches").innerHTML =
-      `<div class="card">${escapeHTML(error.message)}<p class="muted small">Check your internet connection, token, provider access, and API limits.</p></div>`;
-  }
+  results = [];
+  persist();
 }
 
-async function testConnection() {
-  if (!ZSOCCER.token) {
-    $("apiMessage").textContent = "Enter your API token first.";
+function updateCounts() {
+  document.getElementById('resultCount').textContent = results.length;
+  document.getElementById('analysisCount').textContent = '0';
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function exportHistory() {
+  if (!results.length) {
+    alert('There are no results to export yet.');
     return;
   }
 
-  $("apiMessage").textContent = "Testing connection…";
-  const button = $("testConnection");
-  button.disabled = true;
+  const rows = [
+    ['Round', 'Home score', 'Away score', 'Notes', 'Saved date'],
+    ...results.map(result => [
+      result.round,
+      result.home,
+      result.away,
+      result.notes,
+      result.date
+    ])
+  ];
 
-  try {
-    const response = await fetch("https://api.football-data.org/v4/competitions/PL", {
-      headers: {"X-Auth-Token": ZSOCCER.token}
-    });
+  const csv = rows.map(row =>
+    row.map(value =>
+      '"' + String(value ?? '').replace(/"/g, '""') + '"'
+    ).join(',')
+  ).join('\r\n');
 
-    if (!response.ok) throw new Error(`API returned status ${response.status}`);
+  const blob = new Blob([csv], {
+    type: 'text/csv;charset=utf-8;'
+  });
 
-    const data = await response.json();
-    $("apiMessage").textContent = `Connected successfully. Competition: ${data.name || "Premier League"}.`;
-    setStatus("API CONNECTED", true);
-  } catch (error) {
-    $("apiMessage").textContent = `Connection failed: ${error.message}`;
-    setStatus("API CONNECTION FAILED");
-  } finally {
-    button.disabled = false;
-  }
-}
-
-$("saveToken").addEventListener("click", () => {
-  ZSOCCER.token = $("apiToken").value.trim();
-  localStorage.setItem("gzsp_token", ZSOCCER.token);
-  $("apiMessage").textContent = "Token saved in this browser. Test the connection next.";
-});
-
-$("testConnection").addEventListener("click", testConnection);
-$("loadFixtures").addEventListener("click", loadFixtures);
-
-$("matchSearch").addEventListener("input", renderMatches);
-$("matchFilter").addEventListener("change", renderMatches);
-
-$("analyseButton").addEventListener("click", () => {
-  const id = $("analysisMatch").value;
-  if (id) openAnalysis(id);
-  else alert("Load fixtures first.");
-});
-
-$("demoButton").addEventListener("click", () => {
-  alert("Demo mode shows example calculations only. It does not represent a real match or live prediction. Load real fixtures to analyse available teams.");
-});
-
-$("exportHistory").addEventListener("click", () => {
-  const rows = [["Match","Date","Prediction","Score estimate","Status"]];
-  ZSOCCER.history.forEach(p => rows.push([
-    p.match, p.date, p.prediction, p.score, p.status
-  ]));
-  const csv = rows.map(row => row.map(value =>
-    '"' + String(value ?? "").replace(/"/g,'""') + '"'
-  ).join(",")).join("\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "general-z-soccer-history.csv";
-  a.click();
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = 'general-z-soccer-history.csv';
+  link.click();
+
   URL.revokeObjectURL(url);
-});
+}
 
-$("clearHistory").addEventListener("click", () => {
-  if (!confirm("Delete all saved predictions from this browser?")) return;
-  ZSOCCER.history = [];
-  saveHistory();
-});
+function membershipNotice() {
+  document.getElementById('vipMessage').textContent =
+    'Membership is not active. Secure server-side access validation and a payment provider must be configured first.';
 
-$("apiToken").value = ZSOCCER.token;
-$("matchDate").value = new Date().toISOString().slice(0,10);
-updateCounters();
+  alert('VIP access is not activated yet.');
+}
+
 renderHistory();
-renderHomeMatches();
-setStatus(ZSOCCER.token ? "TOKEN SAVED — TEST CONNECTION" : "DATA CONNECTION NOT CONFIGURED");
-/* PART 4 — FINAL STARTUP AND APP BRANDING */
-
-function addAppIcon() {
-  const svg = `
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <rect width="100" height="100" rx="22" fill="#090b10"/>
-    <rect x="4" y="4" width="92" height="92" rx="19"
-      fill="none" stroke="#f2c14e" stroke-width="4"/>
-    <path d="M50 16 L60 25 L73 23 L71 37 L82 46 L70 55 L70 70 L50 65 L30 70 L30 55 L18 46 L29 37 L27 23 L40 25 Z"
-      fill="#171e2b" stroke="#f2c14e" stroke-width="2"/>
-    <circle cx="50" cy="43" r="18" fill="#fff" stroke="#101520" stroke-width="3"/>
-    <path d="M50 32 L58 38 L55 47 L45 47 L42 38 Z"
-      fill="#111722"/>
-    <path d="M50 32 L42 26 M58 38 L68 36 M55 47 L61 57 M45 47 L39 57 M42 38 L32 36"
-      stroke="#111722" stroke-width="3" fill="none"/>
-    <text x="50" y="81" text-anchor="middle"
-      font-family="Arial" font-weight="900" font-size="11" fill="#f2c14e">GENERAL</text>
-    <text x="50" y="91" text-anchor="middle"
-      font-family="Arial" font-weight="900" font-size="8" fill="#fff">Z-SOCCER PRO</text>
-  </svg>`;
-
-  const icon = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  let link = document.querySelector('link[rel="icon"]');
-  if (!link) {
-    link = document.createElement("link");
-    link.rel = "icon";
-    document.head.appendChild(link);
-  }
-  link.href = icon;
-}
-
-function initialiseApp() {
-  addAppIcon();
-  updateCounters();
-  renderHistory();
-  renderHomeMatches();
-
-  if (ZSOCCER.token) {
-    setStatus("TOKEN SAVED — TEST CONNECTION");
-  } else {
-    setStatus("DATA CONNECTION NOT CONFIGURED");
-  }
-
-  showPage("home");
-}
-
-initialiseApp();
+updateCounts();
 </script>
+
 </body>
 </html>
