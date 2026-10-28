@@ -614,6 +614,11 @@ main {
       This app will not fabricate selections, scores, odds, or probabilities.
     </div>
 
+    <h2 class="section-title">LIVE FOOTBALL FIXTURES</h2>
+
+<div id="liveFixtures" class="market-list">
+  <div class="notice">Connecting to live football data...</div>
+</div>
     <h2 class="section-title">AVAILABLE MARKET CATEGORIES</h2>
 
     <div class="market-list">
@@ -1330,6 +1335,68 @@ function exportHistory() {
 
 /* START THE APP */
 renderHistory();
+
+/* LOAD REAL FOOTBALL FIXTURES */
+async function loadLiveFixtures() {
+  const container = document.getElementById("liveFixtures");
+  if (!container) return;
+
+  container.innerHTML =
+    '<div class="notice">Loading football fixtures...</div>';
+
+  try {
+    const response = await fetch("/api/fixtures");
+    const data = await response.json();
+
+    if (!response.ok || !data.ok || !Array.isArray(data.matches)) {
+      throw new Error(data.message || "Unable to load fixtures.");
+    }
+
+    if (data.matches.length === 0) {
+      container.innerHTML =
+        '<div class="notice">No fixtures are available from the provider right now.</div>';
+      return;
+    }
+
+    container.innerHTML = data.matches.map(match => {
+      const home = match.homeTeam?.name || "Home team";
+      const away = match.awayTeam?.name || "Away team";
+      const competition = match.competition?.name || "Football";
+      const kickoff = match.utcDate
+        ? new Date(match.utcDate).toLocaleString()
+        : "Time unavailable";
+      const status = match.status || "SCHEDULED";
+
+      return `
+        <div class="market">
+          <div class="market-top">
+            <h3>${escapeFixtureText(home)} vs ${escapeFixtureText(away)}</h3>
+            <span class="badge pending">${escapeFixtureText(status)}</span>
+          </div>
+          <p>${escapeFixtureText(competition)}</p>
+          <p>Kick-off: ${escapeFixtureText(kickoff)}</p>
+          <p>Fixture data received from the football data provider.</p>
+        </div>
+      `;
+    }).join("");
+
+  } catch (error) {
+    container.innerHTML =
+      '<div class="notice">Could not load fixtures. Please refresh and try again.</div>';
+  }
+}
+
+function escapeFixtureText(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+loadLiveFixtures();
 </script>
 
 </body>
