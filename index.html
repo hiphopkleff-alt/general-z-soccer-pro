@@ -108,6 +108,18 @@ footer{text-align:center;color:#777;font-size:10px;padding:22px 10px}
   <div class="notice">Bookmaker odds are not included unless a supported odds feed is connected. Any analysis shown here is an estimate, not verified betting advice.</div>
 </section>
 
+  <section id="matchDetailPage" class="page">
+  <div class="btnrow">
+    <button class="btn secondary" onclick="backToFixtures()">
+      ← BACK TO MATCHES
+    </button>
+  </div>
+
+  <h1>⚽ Match Analysis</h1>
+
+  <div id="matchDetailContent"></div>
+  </section>
+  
 <section id="zoomSoccer" class="page">
   <h1>🎮 Zoom Soccer</h1>
   <p>Virtual matches are separate from real-world football fixtures.</p>
@@ -274,94 +286,106 @@ function openMatch(index) {
 
   const home = m.homeTeam?.name || 'Home team';
   const away = m.awayTeam?.name || 'Away team';
-  const status = statusText(m);
+  const competition = m.competition?.name || 'Competition unavailable';
   const score = scoreText(m);
-  const details = $('matchDetails');
+  const content = $('matchDetailContent');
 
-  details.style.display = 'block';
+  content.innerHTML = `
+    <div class="panel">
+      <span class="tag">${escapeHTML(statusText(m))}</span>
 
-  details.innerHTML = `
-    <div class="btnrow">
-      <button id="closeAnalysis" class="btn secondary">
-        CLOSE ANALYSIS
-      </button>
+      <h2 style="margin-top:15px;font-size:22px">
+        ${escapeHTML(home)}
+        <span class="gold">VS</span>
+        ${escapeHTML(away)}
+      </h2>
+
+      <p>
+        ${escapeHTML(competition)}<br>
+        ${escapeHTML(dateText(m.utcDate))}
+      </p>
+
+      ${score ? `
+        <div class="pick">FULL-TIME SCORE: ${escapeHTML(score)}</div>
+      ` : ''}
     </div>
 
-    <span class="tag">MATCH ANALYSIS</span>
-
-    <h2 style="margin-top:12px">
-      ${escapeHTML(home)} vs ${escapeHTML(away)}
-    </h2>
-
-    <p>
-      ${escapeHTML(m.competition?.name || 'Competition unavailable')}<br>
-      ${escapeHTML(dateText(m.utcDate))}<br>
-      Status: ${escapeHTML(status)}
-      ${score ? '<br>Score: ' + escapeHTML(score) : ''}
-    </p>
-
-    <hr>
-
-    <h2>Markets</h2>
-
-    <div class="marketgrid">
-      <div class="market">
-        <strong>1X2</strong>
-        <span>Home / Draw / Away: odds unavailable.</span>
+    <div class="panel">
+      <h2>Recommended Pick</h2>
+      <div class="notice">
+        INSUFFICIENT DATA — more team statistics are needed
+        before a responsible recommendation can be made.
       </div>
+    </div>
 
-      <div class="market">
-        <strong>Double Chance</strong>
-        <span>1X / X2 / 12: insufficient data.</span>
-      </div>
+    <div class="panel">
+      <h2>Match Markets</h2>
 
-      <div class="market">
-        <strong>Over / Under Goals</strong>
-        <span>Insufficient goal statistics.</span>
-      </div>
+      <div class="marketgrid">
+        <div class="market">
+          <strong>1X2</strong>
+          <span>Home / Draw / Away</span>
+          <p>Odds unavailable</p>
+        </div>
 
-      <div class="market">
-        <strong>BTTS</strong>
-        <span>Both teams to score: insufficient data.</span>
-      </div>
+        <div class="market">
+          <strong>Double Chance</strong>
+          <span>1X / X2 / 12</span>
+          <p>Awaiting statistics</p>
+        </div>
 
-      <div class="market">
-        <strong>Correct Score</strong>
-        <span>Insufficient data for a reliable estimate.</span>
-      </div>
+        <div class="market">
+          <strong>Over / Under Goals</strong>
+          <span>Goal totals</span>
+          <p>Awaiting statistics</p>
+        </div>
 
-      <div class="market">
-        <strong>Half-Time / Full-Time</strong>
-        <span>Insufficient data.</span>
-      </div>
+        <div class="market">
+          <strong>Both Teams to Score</strong>
+          <span>BTTS Yes / No</span>
+          <p>Awaiting statistics</p>
+        </div>
 
-      <div class="market">
-        <strong>Team Goals</strong>
-        <span>Home and away goal estimates unavailable.</span>
-      </div>
+        <div class="market">
+          <strong>Correct Score</strong>
+          <span>Possible scorelines</span>
+          <p>Awaiting statistics</p>
+        </div>
 
-      <div class="market">
-        <strong>Form / H2H</strong>
-        <span>Recent form and head-to-head data unavailable.</span>
+        <div class="market">
+          <strong>Half-Time / Full-Time</strong>
+          <span>Combined outcomes</span>
+          <p>Awaiting statistics</p>
+        </div>
+
+        <div class="market">
+          <strong>Team Goals</strong>
+          <span>Home and away totals</span>
+          <p>Awaiting statistics</p>
+        </div>
+
+        <div class="market">
+          <strong>Form and H2H</strong>
+          <span>Recent form and head-to-head</span>
+          <p>Data unavailable</p>
+        </div>
       </div>
     </div>
 
     <div class="notice">
-      RECOMMENDED PICK: INSUFFICIENT DATA.
-      A reliable recommendation requires more statistics.
-      No outcome is guaranteed.
+      These markets are analysis categories, not confirmed predictions.
+      Actual bookmaker odds and reliable probabilities require
+      appropriate data sources. No outcome is guaranteed.
     </div>
   `;
 
-  $('closeAnalysis').addEventListener('click', () => {
-    details.style.display = 'none';
-  });
-
-  details.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+  showPage('matchDetailPage');
 }
+
+function backToFixtures() {
+  showPage('realFootball');
+}
+
 async function loadFixtures() {
   const status = $('fixtureStatus');
   const container = $('liveFixtures');
