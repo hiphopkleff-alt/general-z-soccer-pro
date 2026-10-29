@@ -439,18 +439,21 @@ async function openMatch(index) {
     let predictionHTML = '';
 
     if (prediction) {
-      const markets = [
-        ['Home Win', prediction.homeWin],
-        ['Draw', prediction.draw],
-        ['Away Win', prediction.awayWin],
-        ['Over 1.5 Goals', prediction.over15],
-        ['Over 2.5 Goals', prediction.over25],
-        ['Over 3.5 Goals', prediction.over35],
-        ['Under 2.5 Goals', 1 - prediction.over25],
-        ['BTTS — Yes', prediction.btts],
-        ['BTTS — No', 1 - prediction.btts]
-      ];
-
+      
+const markets = [
+['Home Win', prediction.homeWin],
+['Draw', prediction.draw],
+['Away Win', prediction.awayWin],
+['Double Chance — 1X', prediction.homeWin + prediction.draw],
+['Double Chance — X2', prediction.draw + prediction.awayWin],
+['Double Chance — 12', prediction.homeWin + prediction.awayWin],
+['Over 1.5 Goals', prediction.over15],
+['Over 2.5 Goals', prediction.over25],
+['Over 3.5 Goals', prediction.over35],
+['Under 2.5 Goals', 1 - prediction.over25],
+['BTTS — Yes', prediction.btts],
+['BTTS — No', 1 - prediction.btts]
+];
       predictionHTML = `
         <div class="panel">
           <h2>📈 Estimated Probabilities</h2>
