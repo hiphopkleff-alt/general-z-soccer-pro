@@ -271,32 +271,97 @@ function renderFixtures() {
 function openMatch(index) {
   const m = fixtures[index];
   if (!m) return;
-  const home = m.homeTeam && m.homeTeam.name || 'Home team';
-  const away = m.awayTeam && m.awayTeam.name || 'Away team';
+
+  const home = m.homeTeam?.name || 'Home team';
+  const away = m.awayTeam?.name || 'Away team';
   const status = statusText(m);
   const score = scoreText(m);
   const details = $('matchDetails');
-  details.style.display = 'block';
-  details.innerHTML =
-    '<div class="btnrow"><button class="btn secondary" onclick="$(\\'matchDetails\\').style.display=\\'none\\'">CLOSE ANALYSIS</button></div>'+
-    '<span class="tag">MATCH ANALYSIS</span>'+
-    '<h2 style="margin-top:12px">'+escapeHTML(home)+' vs '+escapeHTML(away)+'</h2>'+
-    '<p>'+escapeHTML(m.competition && m.competition.name || 'Competition unavailable')+'<br>'+escapeHTML(dateText(m.utcDate))+'<br>Status: '+escapeHTML(status)+(score ? '<br>Score: '+escapeHTML(score) : '')+'</p>'+
-    '<hr><h2>Markets</h2>'+
-    '<div class="marketgrid">'+
-      '<div class="market"><strong>1X2</strong><span>Home / Draw / Away: odds unavailable; probabilities require sufficient team statistics.</span></div>'+
-      '<div class="market"><strong>Double Chance</strong><span>1X / X2 / 12: insufficient data for a reliable estimate.</span></div>'+
-      '<div class="market"><strong>Over / Under Goals</strong><span>Insufficient recent goal statistics for a responsible estimate.</span></div>'+
-      '<div class="market"><strong>BTTS</strong><span>Both teams to score: insufficient data.</span></div>'+
-      '<div class="market"><strong>Correct Score</strong><span>Unavailable without a validated statistical model and sufficient data.</span></div>'+
-      '<div class="market"><strong>Half-Time / Full-Time</strong><span>Insufficient data.</span></div>'+
-      '<div class="market"><strong>Team Goals</strong><span>Home and away goal estimates unavailable.</span></div>'+
-      '<div class="market"><strong>Form / H2H</strong><span>Recent form, home/away splits and head-to-head records are not supplied by this fixture response.</span></div>'+
-    '</div>'+
-    '<div class="notice">RECOMMENDED PICK: INSUFFICIENT DATA. This fixture feed confirms match details, but does not provide enough statistics or verified odds to responsibly recommend a bet. No outcome is guaranteed.</div>';
-  details.scrollIntoView({behavior:'smooth',block:'start'});
-}
 
+  details.style.display = 'block';
+
+  details.innerHTML = `
+    <div class="btnrow">
+      <button id="closeAnalysis" class="btn secondary">
+        CLOSE ANALYSIS
+      </button>
+    </div>
+
+    <span class="tag">MATCH ANALYSIS</span>
+
+    <h2 style="margin-top:12px">
+      ${escapeHTML(home)} vs ${escapeHTML(away)}
+    </h2>
+
+    <p>
+      ${escapeHTML(m.competition?.name || 'Competition unavailable')}<br>
+      ${escapeHTML(dateText(m.utcDate))}<br>
+      Status: ${escapeHTML(status)}
+      ${score ? '<br>Score: ' + escapeHTML(score) : ''}
+    </p>
+
+    <hr>
+
+    <h2>Markets</h2>
+
+    <div class="marketgrid">
+      <div class="market">
+        <strong>1X2</strong>
+        <span>Home / Draw / Away: odds unavailable.</span>
+      </div>
+
+      <div class="market">
+        <strong>Double Chance</strong>
+        <span>1X / X2 / 12: insufficient data.</span>
+      </div>
+
+      <div class="market">
+        <strong>Over / Under Goals</strong>
+        <span>Insufficient goal statistics.</span>
+      </div>
+
+      <div class="market">
+        <strong>BTTS</strong>
+        <span>Both teams to score: insufficient data.</span>
+      </div>
+
+      <div class="market">
+        <strong>Correct Score</strong>
+        <span>Insufficient data for a reliable estimate.</span>
+      </div>
+
+      <div class="market">
+        <strong>Half-Time / Full-Time</strong>
+        <span>Insufficient data.</span>
+      </div>
+
+      <div class="market">
+        <strong>Team Goals</strong>
+        <span>Home and away goal estimates unavailable.</span>
+      </div>
+
+      <div class="market">
+        <strong>Form / H2H</strong>
+        <span>Recent form and head-to-head data unavailable.</span>
+      </div>
+    </div>
+
+    <div class="notice">
+      RECOMMENDED PICK: INSUFFICIENT DATA.
+      A reliable recommendation requires more statistics.
+      No outcome is guaranteed.
+    </div>
+  `;
+
+  $('closeAnalysis').addEventListener('click', () => {
+    details.style.display = 'none';
+  });
+
+  details.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
 async function loadFixtures() {
   const status = $('fixtureStatus');
   const container = $('liveFixtures');
