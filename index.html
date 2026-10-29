@@ -280,108 +280,284 @@ function renderFixtures() {
   }).join('');
 }
 
-function openMatch(index) {
+async function openMatch(index) {
   const m = fixtures[index];
   if (!m) return;
 
   const home = m.homeTeam?.name || 'Home team';
   const away = m.awayTeam?.name || 'Away team';
+  const homeId = Number(m.homeTeam?.id);
+  const awayId = Number(m.awayTeam?.id);
   const competition = m.competition?.name || 'Competition unavailable';
   const score = scoreText(m);
   const content = $('matchDetailContent');
 
+  showPage('matchDetailPage');
+
   content.innerHTML = `
     <div class="panel">
       <span class="tag">${escapeHTML(statusText(m))}</span>
-
       <h2 style="margin-top:15px;font-size:22px">
-        ${escapeHTML(home)}
-        <span class="gold">VS</span>
+        ${escapeHTML(home)} <span class="gold">VS</span>
         ${escapeHTML(away)}
       </h2>
-
-      <p>
-        ${escapeHTML(competition)}<br>
-        ${escapeHTML(dateText(m.utcDate))}
-      </p>
-
-      ${score ? `
-        <div class="pick">FULL-TIME SCORE: ${escapeHTML(score)}</div>
-      ` : ''}
+      <p>${escapeHTML(competition)}<br>
+      ${escapeHTML(dateText(m.utcDate))}</p>
+      ${score ? `<div class="pick">SCORE: ${escapeHTML(score)}</div>` : ''}
     </div>
-
     <div class="panel">
-      <h2>Recommended Pick</h2>
-      <div class="notice">
-        INSUFFICIENT DATA — more team statistics are needed
-        before a responsible recommendation can be made.
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>Match Markets</h2>
-
-      <div class="marketgrid">
-        <div class="market">
-          <strong>1X2</strong>
-          <span>Home / Draw / Away</span>
-          <p>Odds unavailable</p>
-        </div>
-
-        <div class="market">
-          <strong>Double Chance</strong>
-          <span>1X / X2 / 12</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Over / Under Goals</strong>
-          <span>Goal totals</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Both Teams to Score</strong>
-          <span>BTTS Yes / No</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Correct Score</strong>
-          <span>Possible scorelines</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Half-Time / Full-Time</strong>
-          <span>Combined outcomes</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Team Goals</strong>
-          <span>Home and away totals</span>
-          <p>Awaiting statistics</p>
-        </div>
-
-        <div class="market">
-          <strong>Form and H2H</strong>
-          <span>Recent form and head-to-head</span>
-          <p>Data unavailable</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="notice">
-      These markets are analysis categories, not confirmed predictions.
-      Actual bookmaker odds and reliable probabilities require
-      appropriate data sources. No outcome is guaranteed.
+      <h2>📊 Loading Team Statistics</h2>
+      <p id="analysisStatus">Retrieving recent completed matches for both teams...</p>
     </div>
   `;
 
-  showPage('matchDetailPage');
-}
+  if (!Number.isInteger(homeId) || homeId <= 0 ||
+      !Number.isInteger(awayId) || awayId <= 0) {
+    $('analysisStatus').textContent =
+      'Team IDs are missing. Reliable analysis is unavailable for this match.';
+    return;
+  }
 
+  try {
+    const results = await Promise.all([
+      fetch('/api/team-form/' + homeId, {cache:'no-store'}),
+      fetch('/api/team-form/' + awayId, {cache:'no-store'})
+    ]);
+
+    if (!results[0].ok || !results[1].ok) {
+      throw new Error('The statistics provider could not return both teams.');
+    }
+
+    const data = await Promise.all(results.map(r => r.json()));
+
+    if (!data[0].ok || !data[1].ok) {
+      throw new Error('Team statistics are unavailable.');
+    }
+
+    const homeMatches = (data[0].matches || []).filter(x =>
+      Number.isFinite(x.goalsFor) &&
+      Number.isFinite(x.goalsAgainst)
+    );
+
+    const awayMatches = (data[1].matches || []).filter(x =>
+      Number.isFinite(x.goalsFor) &&
+      Number.isFinite(x.goalsAgainst)
+    );
+
+    function summarize(matches) {
+      const recent = matches.slice(-10);
+      const n = recent.length;
+      if (!n) return null;
+
+      const wins = recent.filter(x => x.result === 'WIN').length;
+      const draws = recent.filter(x => x.result === 'DRAW').length;
+      const losses = recent.filter(x => x.result === 'LOSS').length;
+      const scored = recent.reduce((s,x) => s + x.goalsFor, 0);
+      const conceded = recent.reduce((s,x) => s + x.goalsAgainst, 0);
+
+      return {
+        n, wins, draws, losses,
+        scored: scored / n,
+        conceded: conceded / n
+      };
+    }
+
+    const hs = summarize(homeMatches);
+    const as = summarize(awayMatches);
+
+    function percent(x) {
+      return (x * 100).toFixed(1) + '%';
+    }
+
+    function poisson(k, lambda) {
+      if (!Number.isFinite(lambda) || lambda < 0) return 0;
+      let p = Math.exp(-lambda);
+      for (let i = 1; i <= k; i++) p *= lambda / i;
+      return p;
+    }
+
+    function calculate(homeStats, awayStats) {
+      if (!homeStats || !awayStats ||
+          homeStats.n < 5 || awayStats.n < 5) return null;
+
+      // Simple historical scoring model. These are estimates,
+      // not bookmaker odds or a validated professional forecasting model.
+      const homeExpected = Math.max(0.15, Math.min(4,
+        (homeStats.scored + awayStats.conceded) / 2));
+      const awayExpected = Math.max(0.15, Math.min(4,
+        (awayStats.scored + homeStats.conceded) / 2));
+
+      let homeWin = 0, draw = 0, awayWin = 0;
+      let over15 = 0, over25 = 0, over35 = 0, btts = 0;
+      const scores = [];
+
+      for (let h = 0; h <= 6; h++) {
+        for (let a = 0; a <= 6; a++) {
+          const p = poisson(h, homeExpected) * poisson(a, awayExpected);
+          if (h > a) homeWin += p;
+          else if (h === a) draw += p;
+          else awayWin += p;
+
+          if (h + a >= 2) over15 += p;
+          if (h + a >= 3) over25 += p;
+          if (h + a >= 4) over35 += p;
+          if (h > 0 && a > 0) btts += p;
+
+          scores.push({h, a, p});
+        }
+      }
+
+      const total = homeWin + draw + awayWin;
+      scores.sort((x,y) => y.p - x.p);
+
+      return {
+        homeExpected, awayExpected,
+        homeWin: homeWin / total,
+        draw: draw / total,
+        awayWin: awayWin / total,
+        over15, over25, over35, btts,
+        scores: scores.slice(0,5)
+      };
+    }
+
+    const prediction = calculate(hs, as);
+
+    function formCard(team, s) {
+      if (!s) {
+        return `<div class="market"><strong>${escapeHTML(team)}</strong>
+          <p>Insufficient completed-match data.</p></div>`;
+      }
+      return `<div class="market">
+        <strong>${escapeHTML(team)}</strong>
+        <span>Last ${s.n} matches</span>
+        <p>Wins: ${s.wins} · Draws: ${s.draws} · Losses: ${s.losses}</p>
+        <p>Average goals scored: ${s.scored.toFixed(2)}</p>
+        <p>Average goals conceded: ${s.conceded.toFixed(2)}</p>
+      </div>`;
+    }
+
+    let predictionHTML = '';
+
+    if (prediction) {
+      const markets = [
+        ['Home Win', prediction.homeWin],
+        ['Draw', prediction.draw],
+        ['Away Win', prediction.awayWin],
+        ['Over 1.5 Goals', prediction.over15],
+        ['Over 2.5 Goals', prediction.over25],
+        ['Over 3.5 Goals', prediction.over35],
+        ['Under 2.5 Goals', 1 - prediction.over25],
+        ['BTTS — Yes', prediction.btts],
+        ['BTTS — No', 1 - prediction.btts]
+      ];
+
+      predictionHTML = `
+        <div class="panel">
+          <h2>📈 Estimated Probabilities</h2>
+          <div class="notice">
+            Model estimates from recent goal averages. These are not
+            bookmaker odds and are not guaranteed outcomes.
+          </div>
+          <p>Estimated home goals: <strong>${prediction.homeExpected.toFixed(2)}</strong></p>
+          <p>Estimated away goals: <strong>${prediction.awayExpected.toFixed(2)}</strong></p>
+          <div class="marketgrid">
+            ${markets.map(([name,value]) => `
+              <div class="market">
+                <strong>${name}</strong>
+                <span>${percent(Math.max(0, Math.min(1,value)))}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="panel">
+          <h2>🎯 Possible Correct Scores</h2>
+          <p>Ranked by this model's estimated score probabilities.</p>
+          <div class="marketgrid">
+            ${prediction.scores.map(s => `
+              <div class="market">
+                <strong>${s.h} - ${s.a}</strong>
+                <span>${percent(s.p)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else {
+      predictionHTML = `
+        <div class="panel">
+          <h2>Estimated Predictions</h2>
+          <div class="notice">
+            Insufficient data. At least five completed matches with
+            valid scores for each team are required by this basic model.
+          </div>
+        </div>
+      `;
+    }
+
+    content.innerHTML = `
+      <div class="panel">
+        <span class="tag">${escapeHTML(statusText(m))}</span>
+        <h2 style="margin-top:15px;font-size:22px">
+          ${escapeHTML(home)} <span class="gold">VS</span>
+          ${escapeHTML(away)}
+        </h2>
+        <p>${escapeHTML(competition)}<br>
+        ${escapeHTML(dateText(m.utcDate))}</p>
+        ${score ? `<div class="pick">SCORE: ${escapeHTML(score)}</div>` : ''}
+      </div>
+
+      <div class="panel">
+        <h2>📋 Recent Team Form</h2>
+        <div class="marketgrid">
+          ${formCard(home, hs)}
+          ${formCard(away, as)}
+        </div>
+      </div>
+
+      ${predictionHTML}
+
+      <div class="panel">
+        <h2>Other Markets</h2>
+        <div class="marketgrid">
+          <div class="market"><strong>Double Chance</strong>
+            <span>1X: ${prediction ? percent(prediction.homeWin + prediction.draw) : 'Unavailable'}</span>
+            <p>X2 and 12 require further calculations.</p>
+          </div>
+          <div class="market"><strong>Half-Time / Full-Time</strong>
+            <span>Unavailable</span>
+            <p>Half-time scoring data is not modelled here.</p>
+          </div>
+          <div class="market"><strong>Bookmaker Odds</strong>
+            <span>Unavailable</span>
+            <p>No odds feed is connected.</p>
+          </div>
+          <div class="market"><strong>Head-to-Head</strong>
+            <span>Not included</span>
+            <p>Historical team form is shown above.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice">
+        This is a basic statistical estimate, not a validated professional
+        forecasting model. Recent form alone cannot account for line-ups,
+        injuries, home advantage, or all match conditions. No outcome is
+        guaranteed.
+      </div>
+    `;
+
+  } catch (error) {
+    content.innerHTML += `
+      <div class="panel">
+        <h2>Statistics unavailable</h2>
+        <div class="notice">
+          ${escapeHTML(error.message || 'Could not load team statistics.')}
+          Try again later. The fixtures page and backend have not been changed.
+        </div>
+      </div>
+    `;
+  }
+}
 function backToFixtures() {
   showPage('realFootball');
 }
