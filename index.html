@@ -500,6 +500,19 @@ const awayId = match.awayTeam?.id;
 if (!homeId || !awayId) {
   box.innerHTML =
     '<div class="muted">NO TEAM DATA AVAILABLE</div>';
+
+async function loadFixtureRecommendations() {
+for (let i = 0; i < fixtures.length; i++) {
+const match = fixtures[i];
+
+const box = document.getElementById('fixture-pick-' + i);
+if (!box) continue;
+
+const homeId = match.homeTeam?.id;
+const awayId = match.awayTeam?.id;
+
+if (!homeId || !awayId) {
+  box.innerHTML = '<div class="muted">NO TEAM DATA</div>';
   continue;
 }
 
@@ -513,35 +526,23 @@ const recommendation =
   calculateFixturePick(homeForm, awayForm);
 
 if (recommendation) {
-  const showPick = (label, pick, cssClass) => {
-    if (!pick) {
-      return `
-        <div class="pick ${cssClass}">
-          ${label}: NO QUALIFIED PICK
-        </div>
-      `;
-    }
-
-    return `
-      <div class="pick ${cssClass}">
-        ${label}:
-        <strong>${escapeHTML(pick.name)}</strong>
-        <span class="gold">${pick.probability}%</span>
-      </div>
-    `;
-  };
+  const showLine = (number, pick) => `
+    <div class="pick" style="padding:5px 0;border:none;">
+      ${number}:
+      <strong>${pick ? escapeHTML(pick.name) : '--'}</strong>
+      <span class="gold">
+        ${pick ? pick.probability + '%' : '--'}
+      </span>
+    </div>
+  `;
 
   box.innerHTML = `
-    ${showPick('SAFE PICK', recommendation.safe, 'safe-pick')}
-
-    ${showPick('MODERATE PICK', recommendation.moderate, 'moderate-pick')}
-
-    <div class="pick fallback-pick">
-      FALLBACK PICK:
-      <strong>${escapeHTML(recommendation.fallback.name)}</strong>
-      <span class="gold">${recommendation.fallback.probability}%</span>
-      <small>${escapeHTML(recommendation.fallback.confidence)}</small>
+    <div style="font-weight:bold;color:#e9bd52;margin-bottom:6px;">
+      RECOMMENDATION
     </div>
+    ${showLine(1, recommendation.safe)}
+    ${showLine(2, recommendation.moderate)}
+    ${showLine(3, recommendation.fallback)}
   `;
 } else {
   box.innerHTML =
@@ -553,7 +554,6 @@ await new Promise(resolve => setTimeout(resolve, 1500));
 
 }
 }
-
 
 async function openMatch(index) {
   const m = fixtures[index];
