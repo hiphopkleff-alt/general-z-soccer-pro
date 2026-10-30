@@ -454,7 +454,62 @@ const markets = [
 ['BTTS — Yes', prediction.btts],
 ['BTTS — No', 1 - prediction.btts]
 ];
-      predictionHTML = `
+     const pickCandidates = markets
+.map(([name, value]) => ({
+name,
+probability: Math.max(0, Math.min(1, value))
+}))
+.sort((a, b) => b.probability - a.probability);
+
+function choosePick(min, max) {
+return pickCandidates.find(p =>
+p.probability >= min && p.probability < max
+);
+}
+
+const recommendedPicks = [
+{
+title: '🟢 SAFE PICK',
+pick: choosePick(0.70, 1.01),
+range: '70% or higher'
+},
+{
+title: '🟡 MODERATE PICK',
+pick: choosePick(0.55, 0.70),
+range: '55%–69.9%'
+},
+{
+title: '🔴 RISKY PICK',
+pick: choosePick(0.40, 0.55),
+range: '40%–54.9%'
+}
+];
+
+const recommendedHTML = `
+
+  <div class="panel">
+    <h2>🏆 GENERAL AI RECOMMENDED PICKS</h2>
+    <div class="notice">
+      Selections are ranked using estimated probabilities.
+      They are not guaranteed outcomes.
+    </div>
+    <div class="marketgrid">
+      ${recommendedPicks.map(item => `
+        <div class="market">
+          <strong>${item.title}</strong>
+          <span>${item.pick
+            ? (item.pick.probability * 100).toFixed(1) + '%'
+            : 'NO QUALIFIED PICK'}</span>
+          <p>${item.pick
+            ? escapeHTML(item.pick.name)
+            : 'No market meets this probability range.'}</p>
+          <small>Qualification range: ${item.range}</small>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+`; 
+      predictionHTML = recommendedHTML + `
         <div class="panel">
           <h2>📈 Estimated Probabilities</h2>
           <div class="notice">
