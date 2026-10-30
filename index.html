@@ -244,14 +244,34 @@ function scoreText(match) {
 }
 
 function safeOdds(match) {
-  // Football-data.org match fixtures generally do not include bookmaker odds.
-  // Never invent odds. Only show odds if a future backend explicitly supplies them.
-  const o = match.odds;
-  if (!o) return '<div class="oddsrow"><span class="odd">Home: unavailable</span><span class="odd">Draw: unavailable</span><span class="odd">Away: unavailable</span></div>';
-  const home = o.home != null ? escapeHTML(o.home) : 'N/A';
-  const draw = o.draw != null ? escapeHTML(o.draw) : 'N/A';
-  const away = o.away != null ? escapeHTML(o.away) : 'N/A';
-  return '<div class="oddsrow"><span class="odd">Home '+home+'</span><span class="odd">Draw '+draw+'</span><span class="odd">Away '+away+'</span></div>';
+  const o = match && match.odds;
+
+  if (
+    !o ||
+    (o.homeWin == null && o.draw == null && o.awayWin == null)
+  ) {
+    return '';
+  }
+
+  const home = o.homeWin != null
+    ? escapeHTML(o.homeWin)
+    : 'N/A';
+
+  const draw = o.draw != null
+    ? escapeHTML(o.draw)
+    : 'N/A';
+
+  const away = o.awayWin != null
+    ? escapeHTML(o.awayWin)
+    : 'N/A';
+
+  return `
+    <div class="oddsrow">
+      <span class="odd">Home ${home}</span>
+      <span class="odd">Draw ${draw}</span>
+      <span class="odd">Away ${away}</span>
+    </div>
+  `;
 }
 
  // ===== FIXTURE RECOMMENDATION ENGINE =====
@@ -304,87 +324,57 @@ function calculateFixturePick(homeForm, awayForm) {
   const awayGoals = Number(a.averageGoalsScored);
   const awayConceded = Number(a.averageGoalsConceded);
 
-  if (
-    ![
-      homeGoals,
-      homeConceded,
-      awayGoals,
-      awayConceded
-    ].every(Number.isFinite)
-  ) {
-    return null;
-  }
+  if (![homeGoals, homeConceded, awayGoals, awayConceded]
+    .every(Number.isFinite)) return null;
 
   if (
     Number(h.matchesPlayed || 0) < 5 ||
     Number(a.matchesPlayed || 0) < 5
-  ) {
-    return null;
-  }
+  ) return null;
 
   const homeExpected = Math.max(
-    0.15,
-    Math.min(4, (homeGoals + awayConceded) / 2)
+    0.15, Math.min(4, (homeGoals + awayConceded) / 2)
   );
 
   const awayExpected = Math.max(
-    0.15,
-    Math.min(4, (awayGoals + homeConceded) / 2)
+    0.15, Math.min(4, (awayGoals + homeConceded) / 2)
   );
 
   function factorial(n) {
     let result = 1;
-
-    for (let i = 2; i <= n; i++) {
-      result *= i;
-    }
-
+    for (let i = 2; i <= n; i++) result *= i;
     return result;
   }
 
   function poisson(lambda, goals) {
-    return (
-      Math.exp(-lambda) *
-      Math.pow(lambda, goals) /
-      factorial(goals)
-    );
+    return Math.exp(-lambda) *
+      Math.pow(lambda, goals) / factorial(goals);
   }
 
   let homeWin = 0;
   let draw = 0;
   let awayWin = 0;
-
   let over15 = 0;
   let over25 = 0;
   let under25 = 0;
   let bttsYes = 0;
-
   let total = 0;
 
   for (let x = 0; x <= 8; x++) {
     for (let y = 0; y <= 8; y++) {
-
-      const probability =
-        poisson(homeExpected, x) *
+      const p = poisson(homeExpected, x) *
         poisson(awayExpected, y);
 
-      total += probability;
+      total += p;
 
-      if (x > y) {
-        homeWin += probability;
-      } else if (x === y) {
-        draw += probability;
-      } else {
-        awayWin += probability;
-      }
+      if (x > y) homeWin += p;
+      else if (x === y) draw += p;
+      else awayWin += p;
 
-      if (x + y >= 2) over15 += probability;
-      if (x + y >= 3) over25 += probability;
-      if (x + y <= 2) under25 += probability;
-
-      if (x > 0 && y > 0) {
-        bttsYes += probability;
-      }
+      if (x + y >= 2) over15 += p;
+      if (x + y >= 3) over25 += p;
+      if (x + y <= 2) under25 += p;
+      if (x > 0 && y > 0) bttsYes += p;
     }
   }
 
@@ -393,7 +383,6 @@ function calculateFixturePick(homeForm, awayForm) {
   homeWin /= total;
   draw /= total;
   awayWin /= total;
-
   over15 /= total;
   over25 /= total;
   under25 /= total;
@@ -401,13 +390,17 @@ function calculateFixturePick(homeForm, awayForm) {
 
   const markets = [
     ['Home Win', homeWin],
+    ['Draw', draw],
     ['Away Win', awayWin],
+
     ['Double Chance 1X', homeWin + draw],
     ['Double Chance X2', draw + awayWin],
     ['Double Chance 12', homeWin + awayWin],
+
     ['Over 1.5 Goals', over15],
     ['Over 2.5 Goals', over25],
     ['Under 2.5 Goals', under25],
+
     ['BTTS Yes', bttsYes],
     ['BTTS No', 1 - bttsYes]
   ];
@@ -422,7 +415,8 @@ function calculateFixturePick(homeForm, awayForm) {
     name: best[0],
     probability: Math.round(best[1] * 100)
   };
-  } 
+}
+  
 // ===== RENDER FIXTURES WITH AI RECOMMENDATIONS =====
 
 function renderFixtures() {
