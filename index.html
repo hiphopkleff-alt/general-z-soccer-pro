@@ -488,73 +488,56 @@ function renderFixtures() {
 // ===== LOAD RECOMMENDATIONS =====
 
 async function loadFixtureRecommendations() {
-for (let i = 0; i < fixtures.length; i++) {
-const match = fixtures[i];
+  for (let i = 0; i < fixtures.length; i++) {
+    const match = fixtures[i];
 
-const box = document.getElementById('fixture-pick-' + i);
-if (!box) continue;
+    const box = document.getElementById('fixture-pick-' + i);
+    if (!box) continue;
 
-const homeId = match.homeTeam?.id;
-const awayId = match.awayTeam?.id;
+    const homeId = match.homeTeam?.id;
+    const awayId = match.awayTeam?.id;
 
-if (!homeId || !awayId) {
-  box.innerHTML =
-    '<div class="muted">NO TEAM DATA AVAILABLE</div>';
+    if (!homeId || !awayId) {
+      box.innerHTML = '<div class="muted">NO TEAM DATA</div>';
+      continue;
+    }
 
-async function loadFixtureRecommendations() {
-for (let i = 0; i < fixtures.length; i++) {
-const match = fixtures[i];
+    box.innerHTML =
+      '<div class="muted">ANALYSING MATCH...</div>';
 
-const box = document.getElementById('fixture-pick-' + i);
-if (!box) continue;
+    const homeForm = await getFixtureTeamForm(homeId);
+    const awayForm = await getFixtureTeamForm(awayId);
 
-const homeId = match.homeTeam?.id;
-const awayId = match.awayTeam?.id;
+    const recommendation =
+      calculateFixturePick(homeForm, awayForm);
 
-if (!homeId || !awayId) {
-  box.innerHTML = '<div class="muted">NO TEAM DATA</div>';
-  continue;
+    if (recommendation) {
+      const showLine = (number, pick) => `
+        <div class="pick" style="padding:5px 0;border:none;">
+          ${number}:
+          <strong>${pick ? escapeHTML(pick.name) : '--'}</strong>
+          <span class="gold">
+            ${pick ? pick.probability + '%' : '--'}
+          </span>
+        </div>
+      `;
+
+      box.innerHTML = `
+        <div style="font-weight:bold;color:#e9bd52;margin-bottom:6px;">
+          RECOMMENDATION
+        </div>
+        ${showLine(1, recommendation.safe)}
+        ${showLine(2, recommendation.moderate)}
+        ${showLine(3, recommendation.fallback)}
+      `;
+    } else {
+      box.innerHTML =
+        '<div class="muted">INSUFFICIENT TEAM DATA</div>';
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 1500));
+  }
 }
-
-box.innerHTML =
-  '<div class="muted">ANALYSING MATCH...</div>';
-
-const homeForm = await getFixtureTeamForm(homeId);
-const awayForm = await getFixtureTeamForm(awayId);
-
-const recommendation =
-  calculateFixturePick(homeForm, awayForm);
-
-if (recommendation) {
-  const showLine = (number, pick) => `
-    <div class="pick" style="padding:5px 0;border:none;">
-      ${number}:
-      <strong>${pick ? escapeHTML(pick.name) : '--'}</strong>
-      <span class="gold">
-        ${pick ? pick.probability + '%' : '--'}
-      </span>
-    </div>
-  `;
-
-  box.innerHTML = `
-    <div style="font-weight:bold;color:#e9bd52;margin-bottom:6px;">
-      RECOMMENDATION
-    </div>
-    ${showLine(1, recommendation.safe)}
-    ${showLine(2, recommendation.moderate)}
-    ${showLine(3, recommendation.fallback)}
-  `;
-} else {
-  box.innerHTML =
-    '<div class="muted">INSUFFICIENT TEAM DATA</div>';
-}
-
-// Pause between matches to protect the API request limit.
-await new Promise(resolve => setTimeout(resolve, 1500));
-
-}
-}
-
 async function openMatch(index) {
   const m = fixtures[index];
   if (!m) return;
