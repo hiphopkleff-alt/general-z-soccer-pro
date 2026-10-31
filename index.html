@@ -532,46 +532,53 @@ async function loadFixtureRecommendations() {
   for (let i = 0; i < fixtures.length; i++) {
     const match = fixtures[i];
 
-    const bestBox = document.getElementById('fixture-best-' + i);
     const box = document.getElementById('fixture-pick-' + i);
 
-    if (!bestBox || !box) continue;
+    if (!box) continue;
 
     const homeId = match.homeTeam?.id;
     const awayId = match.awayTeam?.id;
 
     if (!homeId || !awayId) {
-      bestBox.textContent = 'NO TEAM DATA';
-      box.textContent = 'NO TEAM DATA';
+      box.innerHTML = '<div class="muted">NO TEAM DATA</div>';
       continue;
     }
 
-    bestBox.textContent = 'ANALYSING...';
     box.innerHTML = '<div class="muted">ANALYSING MATCH...</div>';
 
-    const homeForm = await getFixtureTeamForm(homeId);
-    const awayForm = await getFixtureTeamForm(awayId);
+    try {
+      const homeForm = await getFixtureTeamForm(homeId);
+      const awayForm = await getFixtureTeamForm(awayId);
 
-    const recommendation = calculateFixturePick(homeForm, awayForm);
+      const recommendation =
+        calculateFixturePick(homeForm, awayForm);
 
-    if (recommendation) {
-      const best = recommendation.best;
+      if (!recommendation || !recommendation.allMarkets) {
+        box.innerHTML =
+          '<div class="muted">INSUFFICIENT TEAM DATA</div>';
+        continue;
+      }
 
-      bestBox.innerHTML = best
-        ? `<strong>${escapeHTML(best.name)}</strong>
-           <span class="gold">${best.probability}%</span>`
-        : 'NO RECOMMENDATION';
+      const topThree = [
+        recommendation.safe,
+        recommendation.moderate,
+        recommendation.fallback
+      ].filter(Boolean);
 
       box.innerHTML = `
         <h3 class="gold">TOP 3 RECOMMENDATIONS</h3>
-        ${recommendation.topThree.map((pick, n) => `
+
+        ${topThree.map((pick, n) => `
           <div class="pick" style="display:block;margin:7px 0;">
             ${n + 1}. ${escapeHTML(pick.name)}
             <span class="gold">${pick.probability}%</span>
           </div>
         `).join('')}
 
-        <h3 class="gold" style="margin-top:15px;">ALL MARKET PROBABILITIES</h3>
+        <h3 class="gold" style="margin-top:15px;">
+          ALL MARKET PROBABILITIES
+        </h3>
+
         ${recommendation.allMarkets.map(pick => `
           <div class="market" style="margin:6px 0;">
             <strong>${escapeHTML(pick.name)}</strong>
@@ -579,14 +586,18 @@ async function loadFixtureRecommendations() {
           </div>
         `).join('')}
       `;
-    } else {
-      bestBox.textContent = 'INSUFFICIENT DATA';
-      box.innerHTML = '<div class="muted">INSUFFICIENT TEAM DATA</div>';
+
+    } catch (error) {
+      console.error('Fixture recommendation error:', error);
+
+      box.innerHTML =
+        '<div class="muted">ANALYSIS ERROR. PLEASE TRY AGAIN.</div>';
     }
 
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
 }
+  
 async function openMatch(index) {
   const m = fixtures[index];
   if (!m) return;
