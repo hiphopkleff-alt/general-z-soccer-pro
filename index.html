@@ -503,48 +503,56 @@ async function loadFixtureRecommendations() {
   for (let i = 0; i < fixtures.length; i++) {
     const match = fixtures[i];
 
+    const bestBox = document.getElementById('fixture-best-' + i);
     const box = document.getElementById('fixture-pick-' + i);
-    if (!box) continue;
+
+    if (!bestBox || !box) continue;
 
     const homeId = match.homeTeam?.id;
     const awayId = match.awayTeam?.id;
 
     if (!homeId || !awayId) {
-      box.innerHTML = '<div class="muted">NO TEAM DATA</div>';
+      bestBox.textContent = 'NO TEAM DATA';
+      box.textContent = 'NO TEAM DATA';
       continue;
     }
 
-    box.innerHTML =
-      '<div class="muted">ANALYSING MATCH...</div>';
+    bestBox.textContent = 'ANALYSING...';
+    box.innerHTML = '<div class="muted">ANALYSING MATCH...</div>';
 
     const homeForm = await getFixtureTeamForm(homeId);
     const awayForm = await getFixtureTeamForm(awayId);
 
-    const recommendation =
-      calculateFixturePick(homeForm, awayForm);
+    const recommendation = calculateFixturePick(homeForm, awayForm);
 
     if (recommendation) {
-      const showLine = (number, pick) => `
-        <div class="pick" style="padding:5px 0;border:none;">
-          ${number}:
-          <strong>${pick ? escapeHTML(pick.name) : '--'}</strong>
-          <span class="gold">
-            ${pick ? pick.probability + '%' : '--'}
-          </span>
-        </div>
-      `;
+      const best = recommendation.best;
+
+      bestBox.innerHTML = best
+        ? `<strong>${escapeHTML(best.name)}</strong>
+           <span class="gold">${best.probability}%</span>`
+        : 'NO RECOMMENDATION';
 
       box.innerHTML = `
-        <div style="font-weight:bold;color:#e9bd52;margin-bottom:6px;">
-          RECOMMENDATION
-        </div>
-        ${showLine(1, recommendation.safe)}
-        ${showLine(2, recommendation.moderate)}
-        ${showLine(3, recommendation.fallback)}
+        <h3 class="gold">TOP 3 RECOMMENDATIONS</h3>
+        ${recommendation.topThree.map((pick, n) => `
+          <div class="pick" style="display:block;margin:7px 0;">
+            ${n + 1}. ${escapeHTML(pick.name)}
+            <span class="gold">${pick.probability}%</span>
+          </div>
+        `).join('')}
+
+        <h3 class="gold" style="margin-top:15px;">ALL MARKET PROBABILITIES</h3>
+        ${recommendation.allMarkets.map(pick => `
+          <div class="market" style="margin:6px 0;">
+            <strong>${escapeHTML(pick.name)}</strong>
+            <span>${pick.probability}%</span>
+          </div>
+        `).join('')}
       `;
     } else {
-      box.innerHTML =
-        '<div class="muted">INSUFFICIENT TEAM DATA</div>';
+      bestBox.textContent = 'INSUFFICIENT DATA';
+      box.innerHTML = '<div class="muted">INSUFFICIENT TEAM DATA</div>';
     }
 
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -557,7 +565,7 @@ async function openMatch(index) {
   const home = m.homeTeam?.name || 'Home team';
   const away = m.awayTeam?.name || 'Away team';
   const homeId = Number(m.homeTeam?.id);
-  const awayId = Number(m.awayTeam?.id);
+  const awayId =] ;
   const competition = m.competition?.name || 'Competition unavailable';
   const score = scoreText(m);
   const content = $('matchDetailContent');
