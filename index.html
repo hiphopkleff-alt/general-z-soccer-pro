@@ -257,10 +257,18 @@ function dateText(value) {
 }
 
 function statusText(match) {
-  if (match.status === 'FINISHED' || match.status === 'AWARDED') return 'FINISHED';
-  if (match.status === 'IN_PLAY' || match.status === 'LIVE' || match.status === 'PAUSED') return 'LIVE';
-  return 'SCHEDULED';
-  }
+if (match.status === 'FINISHED' || match.status === 'AWARDED') return 'FINISHED';
+
+if (
+match.status === 'IN_PLAY' ||
+match.status === 'LIVE' ||
+match.status === 'PAUSED'
+) return 'LIVE';
+
+if (match.status === 'TIMED') return 'TIMED';
+
+return '';
+}
 
 function scoreText(match) {
   const h = match.score && match.score.fullTime ? match.score.fullTime.home : null;
