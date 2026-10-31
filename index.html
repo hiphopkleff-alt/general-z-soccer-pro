@@ -898,6 +898,63 @@ function backToFixtures() {
   showPage('realFootball');
 }
 
+ function renderFixtures() {
+  const container = $('liveFixtures');
+  container.dataset.loaded = '1';
+
+  if (!fixtures.length) {
+    container.innerHTML =
+      '<div class="empty">No fixtures available. Please refresh later.</div>';
+    return;
+  }
+
+  container.innerHTML = fixtures.map((m, i) => {
+    const home = m.homeTeam?.name || 'Home team';
+    const away = m.awayTeam?.name || 'Away team';
+    const status = statusText(m);
+    const score = scoreText(m);
+
+    return `
+      <div class="match">
+
+        <div class="teams">
+          ${escapeHTML(home)}
+          <span class="gold">VS</span>
+          ${escapeHTML(away)}
+        </div>
+
+        <div class="matchtime">
+          ${escapeHTML(dateText(m.utcDate))}
+        </div>
+
+        ${score ? `<div class="pick">SCORE: ${escapeHTML(score)}</div>` : ''}
+
+        <div class="muted" style="font-size:10px;margin:7px 0;">
+          ${escapeHTML(status)}
+        </div>
+
+        <div class="panel" style="margin:10px 0;">
+          <div class="muted" style="font-size:10px;margin-bottom:7px;">
+            BEST RECOMMENDATION
+          </div>
+          <div id="fixture-best-${i}" class="gold">
+            ANALYSING...
+          </div>
+        </div>
+
+        <button class="btn secondary"
+          style="font-size:11px;padding:8px 13px;"
+          onclick="openMatch(${i})">
+          VIEW ANALYSIS
+        </button>
+
+      </div>
+    `;
+  }).join('');
+
+  loadFixtureRecommendations();
+  }
+  
 async function loadFixtures() {
   const status = $('fixtureStatus');
   const container = $('liveFixtures');
