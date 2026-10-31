@@ -565,7 +565,7 @@ async function openMatch(index) {
   const home = m.homeTeam?.name || 'Home team';
   const away = m.awayTeam?.name || 'Away team';
   const homeId = Number(m.homeTeam?.id);
-  const awayId =] ;
+  const awayId = Number(m.awayTeam?.id);
   const competition = m.competition?.name || 'Competition unavailable';
   const score = scoreText(m);
   const content = $('matchDetailContent');
