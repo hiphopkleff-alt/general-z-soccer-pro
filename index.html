@@ -322,27 +322,49 @@ async function getFixtureTeamForm(teamId) {
 
   try {
     const response = await fetch(
-      '/api/team-form/' + encodeURIComponent(teamId)
+      '/api/team-form/' + encodeURIComponent(teamId),
+      { cache: 'no-store' }
     );
 
     if (!response.ok) return null;
 
     const data = await response.json();
 
-    if (!data || !data.summary) return null;
+    if (!data || !Array.isArray(data.matches)) return null;
+
+    const matches = data.matches.filter(x =>
+      Number.isFinite(Number(x.goalsFor)) &&
+      Number.isFinite(Number(x.goalsAgainst))
+    );
+
+    if (matches.length < 5) return null;
+
+    const recent = matches.slice(-10);
+    const count = recent.length;
+
+    const summary = {
+      matchesPlayed: count,
+      averageGoalsScored:
+        recent.reduce((sum, x) => sum + Number(x.goalsFor), 0) / count,
+      averageGoalsConceded:
+        recent.reduce((sum, x) => sum + Number(x.goalsAgainst), 0) / count
+    };
+
+    const result = { ...data, summary };
 
     fixtureFormCache[teamId] = {
       time: Date.now(),
-      data: data
+      data: result
     };
 
-    return data;
+    return result;
 
   } catch (error) {
     console.error('Team form error:', error);
     return null;
   }
 }
+
 
 function calculateFixturePick(homeForm, awayForm) {
   if (!homeForm || !awayForm) return null;
