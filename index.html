@@ -96,16 +96,34 @@ footer{text-align:center;color:#777;font-size:10px;padding:22px 10px}
 </section>
 
 <section id="realFootball" class="page">
-  <h1>⚽ Real Football</h1>
-  <p>Real-world fixtures from your connected football data provider.</p>
-  <div class="btnrow">
-    <button class="btn" onclick="loadFixtures()">↻ REFRESH FIXTURES</button>
-    <button class="btn secondary" onclick="showPage('home')">← HOME</button>
+
+  <div class="btnrow" style="align-items:center;margin-top:4px;">
+    <button class="btn"
+      style="padding:9px 14px;font-size:11px;min-height:38px;"
+      onclick="loadFixtures()">
+      ↻ REFRESH FIXTURES
+    </button>
+
+    <button class="btn secondary"
+      style="padding:9px 14px;font-size:11px;min-height:38px;"
+      onclick="showPage('home')">
+      ← HOME
+    </button>
   </div>
-  <div id="fixtureStatus" class="status">Tap refresh to load fixtures.</div>
+
+  <div id="fixtureStatus" class="status" style="display:none">
+    Tap refresh to load fixtures.
+  </div>
+
   <div id="liveFixtures"></div>
+
   <div id="matchDetails" class="panel" style="display:none"></div>
-  <div class="notice">Bookmaker odds are not included unless a supported odds feed is connected. Any analysis shown here is an estimate, not verified betting advice.</div>
+
+  <div class="notice">
+    Bookmaker odds are not included unless a supported odds feed is connected.
+    Any analysis shown here is an estimate, not verified betting advice.
+  </div>
+
 </section>
 
   <section id="matchDetailPage" class="page">
@@ -312,115 +330,88 @@ async function getFixtureTeamForm(teamId) {
 }
 
 function calculateFixturePick(homeForm, awayForm) {
-if (!homeForm || !awayForm) return null;
+  if (!homeForm || !awayForm) return null;
 
-const h = homeForm.summary;
-const a = awayForm.summary;
+  const h = homeForm.summary;
+  const a = awayForm.summary;
 
-if (!h || !a) return null;
+  if (!h || !a) return null;
 
-const hg = Number(h.averageGoalsScored);
-const hc = Number(h.averageGoalsConceded);
-const ag = Number(a.averageGoalsScored);
-const ac = Number(a.averageGoalsConceded);
+  const hg = Number(h.averageGoalsScored);
+  const hc = Number(h.averageGoalsConceded);
+  const ag = Number(a.averageGoalsScored);
+  const ac = Number(a.averageGoalsConceded);
 
-if (![hg, hc, ag, ac].every(Number.isFinite)) return null;
+  if (![hg, hc, ag, ac].every(Number.isFinite)) return null;
 
-if (
-Number(h.matchesPlayed || 0) < 5 ||
-Number(a.matchesPlayed || 0) < 5
-) return null;
+  if (
+    Number(h.matchesPlayed || 0) < 5 ||
+    Number(a.matchesPlayed || 0) < 5
+  ) return null;
 
-const homeExpected = Math.max(0.15, Math.min(4, (hg + ac) / 2));
-const awayExpected = Math.max(0.15, Math.min(4, (ag + hc) / 2));
+  const homeExpected = Math.max(0.15, Math.min(4, (hg + ac) / 2));
+  const awayExpected = Math.max(0.15, Math.min(4, (ag + hc) / 2));
 
-function factorial(n) {
-let result = 1;
-for (let i = 2; i <= n; i++) result *= i;
-return result;
-}
+  function factorial(n) {
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
 
-function poisson(lambda, goals) {
-return Math.exp(-lambda) * Math.pow(lambda, goals) / factorial(goals);
-}
+  function poisson(lambda, goals) {
+    return Math.exp(-lambda) * Math.pow(lambda, goals) / factorial(goals);
+  }
 
-let homeWin = 0, draw = 0, awayWin = 0;
-let over15 = 0, under25 = 0, over25 = 0;
-let bttsYes = 0, total = 0;
+  let homeWin = 0;
+  let draw = 0;
+  let awayWin = 0;
+  let bttsYes = 0;
+  let total = 0;
 
-for (let x = 0; x <= 8; x++) {
-for (let y = 0; y <= 8; y++) {
-const p = poisson(homeExpected, x) * poisson(awayExpected, y);
-total += p;
+  for (let x = 0; x <= 10; x++) {
+    for (let y = 0; y <= 10; y++) {
+      const p = poisson(homeExpected, x) * poisson(awayExpected, y);
+      total += p;
 
-  if (x > y) homeWin += p;
-  else if (x === y) draw += p;
-  else awayWin += p;
+      if (x > y) homeWin += p;
+      else if (x === y) draw += p;
+      else awayWin += p;
 
-  if (x + y >= 2) over15 += p;
-  if (x + y >= 3) over25 += p;
-  if (x + y <= 2) under25 += p;
-  if (x > 0 && y > 0) bttsYes += p;
-}
+      if (x > 0 && y > 0) bttsYes += p;
+    }
+  }
 
-}
+  if (!total) return null;
 
-if (!total) return null;
+  homeWin /= total;
+  draw /= total;
+  awayWin /= total;
+  bttsYes /= total;
 
-const markets = {
-homeWin: homeWin / total,
-draw: draw / total,
-awayWin: awayWin / total,
-over15: over15 / total,
-under25: under25 / total,
-over25: over25 / total,
-bttsYes: bttsYes / total
-};
+  const markets = [
+    { name: "1", probability: homeWin },
+    { name: "X", probability: draw },
+    { name: "2", probability: awayWin },
+    { name: "1X", probability: homeWin + draw },
+    { name: "X2", probability: draw + awayWin },
+    { name: "12", probability: homeWin + awayWin },
+    { name: "BTTS YES", probability: bttsYes },
+    { name: "BTTS NO", probability: 1 - bttsYes }
+  ];
 
-markets.bttsNo = 1 - markets.bttsYes;
+  markets.sort((a, b) => b.probability - a.probability);
 
-const safeMarkets = [
-["Over 1.5 Goals", markets.over15],
-["Under 2.5 Goals", markets.under25],
-["Over 2.5 Goals", markets.over25],
-["BTTS Yes", markets.bttsYes],
-["BTTS No", markets.bttsNo]
-].sort((a, b) => b[1] - a[1]);
+  const makePick = market => ({
+    name: market.name,
+    probability: Math.round(market.probability * 100)
+  });
 
-const moderateMarkets = [
-["Home Win", markets.homeWin],
-["Draw", markets.draw],
-["Away Win", markets.awayWin]
-].sort((a, b) => b[1] - a[1]);
-
-const fallbackMarkets = [
-["1X (Home or Draw)", markets.homeWin + markets.draw],
-["X2 (Draw or Away)", markets.draw + markets.awayWin]
-].sort((a, b) => b[1] - a[1]);
-
-const safe = safeMarkets[0][1] >= 0.70
-? {
-name: safeMarkets[0][0],
-probability: Math.round(safeMarkets[0][1] * 100)
-}
-: null;
-
-const moderate = moderateMarkets[0][1] >= 0.45
-? {
-name: moderateMarkets[0][0],
-probability: Math.round(moderateMarkets[0][1] * 100)
-}
-: null;
-
-const fallback = {
-name: fallbackMarkets[0][0],
-probability: Math.round(fallbackMarkets[0][1] * 100),
-confidence: fallbackMarkets[0][1] >= 0.65
-? "QUALIFIED"
-: "LOW CONFIDENCE"
-};
-
-return { safe, moderate, fallback };
+  return {
+    safe: makePick(markets[0]),
+    moderate: makePick(markets[1]),
+    fallback: makePick(markets[2]),
+    allMarkets: markets.map(makePick)
+  };
 }
 
   
