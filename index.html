@@ -439,50 +439,64 @@ function renderFixtures() {
   container.innerHTML = fixtures.map((m, i) => {
     const home = m.homeTeam?.name || 'Home team';
     const away = m.awayTeam?.name || 'Away team';
-    const competition = m.competition?.name || 'Competition';
-    const score = scoreText(m);
+    const status = statusText(m);
 
     return `
-      <article class="match">
-        <div class="matchtop">
-          <span>${escapeHTML(competition)}</span>
-          <span class="tag">${escapeHTML(statusText(m))}</span>
-        </div>
+      <details class="match" name="football-fixtures">
 
-        <div class="teams">
-          ${escapeHTML(home)}
-          <span class="gold">vs</span>
-          ${escapeHTML(away)}
-        </div>
-
-        <div class="matchtime">
-          ${escapeHTML(dateText(m.utcDate))}
-        </div>
-
-        ${score
-          ? `<div class="pick">FULL TIME: ${escapeHTML(score)}</div>`
-          : ''
-        }
-
-        <div class="fixture-recommendation" id="fixture-pick-${i}">
-          <div class="muted" style="font-size:12px">
-            ANALYSING MATCH...
+        <summary style="
+          cursor:pointer;
+          padding:14px;
+          list-style-position:inside;
+        ">
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:8px;
+          ">
+            <strong style="font-size:15px;">
+              ${escapeHTML(home)} vs ${escapeHTML(away)}
+            </strong>
+            <span class="tag">${escapeHTML(status)}</span>
           </div>
+
+          <div style="
+            color:#a4a4a4;
+            font-size:12px;
+            margin-top:7px;
+          ">
+            ${escapeHTML(dateText(m.utcDate))}
+          </div>
+        </summary>
+
+        <div style="padding:12px;border-top:1px solid #333;">
+
+          <div id="fixture-pick-${i}">
+            <div class="muted">ANALYSING MATCH...</div>
+          </div>
+
+          <button class="btn"
+            style="
+              display:block;
+              width:auto;
+              margin:12px auto 2px;
+              padding:8px 16px;
+              font-size:11px;
+              border:1px solid #e9bd52;
+            "
+            onclick="openMatch(${i})">
+            VIEW ANALYSIS
+          </button>
+
         </div>
-
-        ${safeOdds(m)}
-
-        <button class="btn full"
-          style="margin-top:12px"
-          onclick="openMatch(${i})">
-          VIEW ANALYSIS
-        </button>
-      </article>
+      </details>
     `;
   }).join('');
 
   loadFixtureRecommendations();
 }
+          
 
 
 // ===== LOAD RECOMMENDATIONS =====
