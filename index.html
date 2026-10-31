@@ -64,7 +64,7 @@ footer{text-align:center;color:#777;font-size:10px;padding:22px 10px}
 <header>
   <div class="logo">⚽</div>
   <div>
-    <div class="brand">GENERAL SOCCER<br>PREDICTIONS PRO</div>
+    <div class="brand">GENERAL TIPS <br> PRO</div>
     <div class="subtitle">SMART ANALYSIS. SMARTER PREDICTIONS.</div>
   </div>
   <div class="version">V1.0</div>
@@ -72,7 +72,7 @@ footer{text-align:center;color:#777;font-size:10px;padding:22px 10px}
 
 <main>
 <section id="home" class="page active">
-  <h1>Welcome to <span class="gold">GENERAL SOCCER</span></h1>
+  <h1>Welcome to <span class="gold">GENERAL TIPS </span></h1>
   <p>Choose a section to continue.</p>
   <div class="grid">
     <button class="homecard" onclick="showPage('realFootball')">
@@ -360,8 +360,8 @@ function calculateFixturePick(homeForm, awayForm) {
   if (![hg, hc, ag, ac].every(Number.isFinite)) return null;
 
   if (
-    Number(h.matchesPlayed || 0) < 5 ||
-    Number(a.matchesPlayed || 0) < 5
+    Number(h.matchesPlayed ?? homeForm.matches?.length ?? 0) < 5 ||
+    Number(a.matchesPlayed ?? awayForm.matches?.length ?? 0) < 5
   ) return null;
 
   const homeExpected = Math.max(0.15, Math.min(4, (hg + ac) / 2));
